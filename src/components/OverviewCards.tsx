@@ -1,0 +1,155 @@
+import React from 'react';
+import { 
+  Star, 
+  Smile, 
+  Frown, 
+  Meh, 
+  TrendingUp, 
+  MessageSquare, 
+  Tag, 
+  BarChart2, 
+  Award,
+  Zap
+} from 'lucide-react';
+import { Review, RatingStats } from '@/types';
+
+interface OverviewCardsProps {
+  reviews: Review[];
+  ratingStats: RatingStats;
+}
+
+export const OverviewCards: React.FC<OverviewCardsProps> = ({ reviews, ratingStats }) => {
+  const total = reviews.length;
+  if (total === 0) return null;
+
+  const posCount = reviews.filter(r => r.sentiment.label === 'positive').length;
+  const neuCount = reviews.filter(r => r.sentiment.label === 'neutral').length;
+  const negCount = reviews.filter(r => r.sentiment.label === 'negative').length;
+
+  const posPercent = ((posCount / total) * 100).toFixed(1);
+  const negPercent = ((negCount / total) * 100).toFixed(1);
+
+  const taggedCount = reviews.filter(r => r.tags && r.tags.length > 0).length;
+  const taggedPercent = ((taggedCount / total) * 100).toFixed(0);
+
+  return (
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+      
+      {/* 1. 總評論數 */}
+      <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 shadow-sm relative overflow-hidden group hover:border-slate-700 transition-all">
+        <div className="flex items-center justify-between text-slate-400 mb-1.5">
+          <span className="text-xs font-medium">總樣本數</span>
+          <MessageSquare className="w-4 h-4 text-indigo-400" />
+        </div>
+        <div className="flex items-baseline space-x-1.5">
+          <span className="text-2xl font-bold text-white tracking-tight">{total}</span>
+          <span className="text-xs text-slate-500 font-mono">則評論</span>
+        </div>
+        <div className="mt-2 text-[11px] text-slate-400 flex items-center space-x-1">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+          <span>100% 本地即時分析</span>
+        </div>
+      </div>
+
+      {/* 2. 平均評分 */}
+      <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 shadow-sm group hover:border-slate-700 transition-all">
+        <div className="flex items-center justify-between text-slate-400 mb-1.5">
+          <span className="text-xs font-medium">平均星等</span>
+          <Star className="w-4 h-4 text-amber-400 fill-amber-400/20" />
+        </div>
+        <div className="flex items-baseline space-x-1.5">
+          <span className="text-2xl font-bold text-white tracking-tight">
+            {ratingStats.average.toFixed(2)}
+          </span>
+          <span className="text-xs text-slate-400">/ 5.0</span>
+        </div>
+        <div className="mt-2 flex items-center space-x-0.5 text-amber-400">
+          {[1, 2, 3, 4, 5].map((s) => (
+            <Star
+              key={s}
+              className={`w-3 h-3 ${
+                s <= Math.round(ratingStats.average)
+                  ? 'fill-amber-400 text-amber-400'
+                  : 'text-slate-600'
+              }`}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* 3. 滿意度 CSAT */}
+      <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 shadow-sm group hover:border-slate-700 transition-all">
+        <div className="flex items-center justify-between text-slate-400 mb-1.5">
+          <span className="text-xs font-medium">顧客滿意度 (CSAT)</span>
+          <Award className="w-4 h-4 text-emerald-400" />
+        </div>
+        <div className="flex items-baseline space-x-1.5">
+          <span className={`text-2xl font-bold tracking-tight ${
+            ratingStats.csat >= 70 ? 'text-emerald-400' :
+            ratingStats.csat >= 50 ? 'text-amber-400' : 'text-rose-400'
+          }`}>
+            {ratingStats.csat.toFixed(1)}%
+          </span>
+        </div>
+        <div className="mt-2 text-[11px] text-slate-400 truncate">
+          {ratingStats[5] + ratingStats[4]} 則給予 4~5 星
+        </div>
+      </div>
+
+      {/* 4. 淨推薦指數評估 NPS */}
+      <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 shadow-sm group hover:border-slate-700 transition-all">
+        <div className="flex items-center justify-between text-slate-400 mb-1.5">
+          <span className="text-xs font-medium">推薦差額估算</span>
+          <TrendingUp className="w-4 h-4 text-cyan-400" />
+        </div>
+        <div className="flex items-baseline space-x-1.5">
+          <span className={`text-2xl font-bold tracking-tight ${
+            ratingStats.npsScore > 0 ? 'text-emerald-400' :
+            ratingStats.npsScore === 0 ? 'text-slate-300' : 'text-rose-400'
+          }`}>
+            {ratingStats.npsScore > 0 ? `+${ratingStats.npsScore.toFixed(0)}` : ratingStats.npsScore.toFixed(0)}
+          </span>
+          <span className="text-xs text-slate-500 font-mono">pts</span>
+        </div>
+        <div className="mt-2 text-[11px] text-slate-400 truncate">
+          推廣者 - 批評者指標
+        </div>
+      </div>
+
+      {/* 5. 規則詞典情緒比例 */}
+      <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 shadow-sm group hover:border-slate-700 transition-all">
+        <div className="flex items-center justify-between text-slate-400 mb-1.5">
+          <span className="text-xs font-medium">規則情緒極性</span>
+          <Smile className="w-4 h-4 text-emerald-400" />
+        </div>
+        <div className="flex items-center space-x-2">
+          <span className="text-xs font-semibold text-emerald-400">{posPercent}% 正</span>
+          <span className="text-xs text-slate-500">/</span>
+          <span className="text-xs font-semibold text-rose-400">{negPercent}% 負</span>
+        </div>
+        {/* Visual Bar */}
+        <div className="mt-2.5 h-1.5 w-full bg-slate-800 rounded-full flex overflow-hidden">
+          <div style={{ width: `${posPercent}%` }} className="bg-emerald-500 h-full" />
+          <div style={{ width: `${((neuCount / total) * 100).toFixed(0)}%` }} className="bg-slate-600 h-full" />
+          <div style={{ width: `${negPercent}%` }} className="bg-rose-500 h-full" />
+        </div>
+      </div>
+
+      {/* 6. 標籤註記率 */}
+      <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 shadow-sm group hover:border-slate-700 transition-all">
+        <div className="flex items-center justify-between text-slate-400 mb-1.5">
+          <span className="text-xs font-medium">研究標籤註記</span>
+          <Tag className="w-4 h-4 text-violet-400" />
+        </div>
+        <div className="flex items-baseline space-x-1.5">
+          <span className="text-2xl font-bold text-white tracking-tight">{taggedPercent}%</span>
+          <span className="text-xs text-slate-500 font-mono">覆蓋</span>
+        </div>
+        <div className="mt-2 text-[11px] text-slate-400 truncate">
+          {taggedCount} / {total} 則已打手動標籤
+        </div>
+      </div>
+
+    </div>
+  );
+};
