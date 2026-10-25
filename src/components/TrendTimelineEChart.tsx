@@ -5,10 +5,10 @@ import { Review, TrendPoint } from '@/types';
 
 interface TrendTimelineEChartProps {
   reviews: Review[];
+  isDark?: boolean;
 }
 
-export const TrendTimelineEChart: React.FC<TrendTimelineEChartProps> = ({ reviews }) => {
-  // 聚合日期走勢資料
+export const TrendTimelineEChart: React.FC<TrendTimelineEChartProps> = ({ reviews, isDark = true }) => {
   const trendData = useMemo(() => {
     const map = new Map<string, {
       count: number;
@@ -43,7 +43,7 @@ export const TrendTimelineEChart: React.FC<TrendTimelineEChartProps> = ({ review
       const avg = Number((val.totalRating / val.count).toFixed(2));
       points.push({
         date,
-        label: date.slice(5), // e.g. 10-25
+        label: date.slice(5),
         count: val.count,
         avgRating: avg,
         avgRatingNum: avg,
@@ -66,48 +66,48 @@ export const TrendTimelineEChart: React.FC<TrendTimelineEChartProps> = ({ review
     backgroundColor: 'transparent',
     grid: {
       top: 35,
-      right: 40,
-      bottom: 25,
-      left: 40,
+      right: 35,
+      bottom: 20,
+      left: 35,
       containLabel: false,
     },
     tooltip: {
       trigger: 'axis',
       axisPointer: { type: 'cross' },
-      backgroundColor: '#0f172a',
-      borderColor: '#334155',
-      textStyle: { color: '#f8fafc', fontSize: 12 },
+      backgroundColor: isDark ? '#0f172a' : '#ffffff',
+      borderColor: isDark ? '#334155' : '#cbd5e1',
+      textStyle: { color: isDark ? '#f8fafc' : '#0f172a', fontSize: 12 },
     },
     legend: {
       data: ['正面評論', '中性評論', '負面評論', '平均星等'],
       top: 0,
-      textStyle: { color: '#94a3b8', fontSize: 11 },
-      itemWidth: 12,
-      itemHeight: 8,
+      textStyle: { color: isDark ? '#94a3b8' : '#64748b', fontSize: 10 },
+      itemWidth: 10,
+      itemHeight: 7,
     },
     xAxis: {
       type: 'category',
       data: dates,
-      axisLine: { lineStyle: { color: '#334155' } },
-      axisLabel: { color: '#94a3b8', fontSize: 11 },
+      axisLine: { lineStyle: { color: isDark ? '#334155' : '#cbd5e1' } },
+      axisLabel: { color: isDark ? '#94a3b8' : '#64748b', fontSize: 10 },
     },
     yAxis: [
       {
         type: 'value',
-        name: '評論量',
-        nameTextStyle: { color: '#64748b', fontSize: 10 },
-        splitLine: { lineStyle: { color: '#1e293b' } },
-        axisLabel: { color: '#94a3b8', fontSize: 11 },
+        name: '量',
+        nameTextStyle: { color: isDark ? '#64748b' : '#94a3b8', fontSize: 9 },
+        splitLine: { lineStyle: { color: isDark ? '#1e293b' : '#f1f5f9' } },
+        axisLabel: { color: isDark ? '#94a3b8' : '#64748b', fontSize: 10 },
         minInterval: 1,
       },
       {
         type: 'value',
         name: '星等',
-        nameTextStyle: { color: '#f59e0b', fontSize: 10 },
+        nameTextStyle: { color: '#f59e0b', fontSize: 9 },
         min: 1,
         max: 5,
         splitLine: { show: false },
-        axisLabel: { color: '#f59e0b', fontSize: 11 },
+        axisLabel: { color: '#f59e0b', fontSize: 10 },
       },
     ],
     series: [
@@ -124,7 +124,7 @@ export const TrendTimelineEChart: React.FC<TrendTimelineEChartProps> = ({ review
         type: 'bar',
         stack: 'volume',
         data: neuCounts,
-        itemStyle: { color: '#64748b' },
+        itemStyle: { color: isDark ? '#475569' : '#94a3b8' },
       },
       {
         name: '負面評論',
@@ -141,32 +141,38 @@ export const TrendTimelineEChart: React.FC<TrendTimelineEChartProps> = ({ review
         itemStyle: { color: '#f59e0b' },
         lineStyle: { width: 2.5, color: '#f59e0b' },
         symbol: 'circle',
-        symbolSize: 6,
+        symbolSize: 5,
       },
     ],
   };
 
   return (
-    <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 flex flex-col justify-between">
+    <div className="p-3.5 sm:p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between transition-colors min-w-0">
       {/* Header */}
-      <div className="flex items-center justify-between mb-2">
-        <div>
-          <div className="flex items-center space-x-2">
-            <h3 className="text-sm font-semibold text-white tracking-tight">時間趨勢與星等波動</h3>
-            <span className="text-[11px] text-slate-400 font-mono">ECharts</span>
+      <div className="flex items-center justify-between mb-1 gap-2">
+        <div className="min-w-0">
+          <div className="flex items-center space-x-1.5">
+            <h3 className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-white tracking-tight truncate">
+              時間趨勢與星等走勢
+            </h3>
+            <span className="text-[10px] text-slate-500 font-mono px-1 rounded bg-slate-100 dark:bg-slate-800">
+              ECharts
+            </span>
           </div>
-          <p className="text-xs text-slate-400 mt-0.5">堆疊柱狀呈現正負向評論量、折線呈現每日平均星等</p>
+          <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
+            堆疊柱狀呈現各情緒量、折線呈現每日平均星等
+          </p>
         </div>
-        <div className="flex items-center space-x-1.5 text-xs text-slate-400">
-          <Calendar className="w-3.5 h-3.5 text-indigo-400" />
-          <span>{trendData.length} 個時間點</span>
+        <div className="flex items-center space-x-1 text-[11px] text-slate-500 dark:text-slate-400 shrink-0">
+          <Calendar className="w-3.5 h-3.5 text-indigo-500" />
+          <span>{trendData.length} 節點</span>
         </div>
       </div>
 
       {/* Chart Canvas */}
-      <div className="h-48 w-full">
+      <div className="h-44 sm:h-48 w-full min-w-0 overflow-hidden">
         {trendData.length === 0 ? (
-          <div className="h-full flex items-center justify-center text-xs text-slate-500">
+          <div className="h-full flex items-center justify-center text-xs text-slate-400">
             目前無足夠日期資料
           </div>
         ) : (
@@ -174,17 +180,18 @@ export const TrendTimelineEChart: React.FC<TrendTimelineEChartProps> = ({ review
             option={option}
             style={{ height: '100%', width: '100%' }}
             opts={{ renderer: 'svg' }}
+            notMerge={true}
           />
         )}
       </div>
 
       {/* Footer */}
-      <div className="mt-2 pt-2 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
-        <span className="text-[11px] text-slate-400">
-          負面紅條突起通常對應重大改版異常或物流延誤事件
+      <div className="mt-1 pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+        <span className="truncate">
+          紅條突起通常對應改版異常或物流延遲
         </span>
-        <span className="text-[11px] text-amber-400 font-mono">
-          黃線：平均星等走勢 (1~5)
+        <span className="text-amber-500 font-mono shrink-0 ml-2">
+          黃線：平均星等
         </span>
       </div>
     </div>

@@ -25,7 +25,8 @@ import {
   loadReviewsFromDB, 
   updateReviewInDB 
 } from '@/lib/db';
-import { ShieldCheck, HardDrive } from 'lucide-react';
+import { useTheme } from '@/lib/theme';
+import { ShieldCheck } from 'lucide-react';
 
 const INITIAL_FILTERS: FilterState = {
   searchQuery: '',
@@ -42,6 +43,8 @@ const INITIAL_FILTERS: FilterState = {
 };
 
 export default function App() {
+  const { theme, isDark, setTheme } = useTheme();
+
   const [reviews, setReviews] = useState<Review[]>([]);
   const [activeDatasetName, setActiveDatasetName] = useState<string>('電商購物平台顧客真實反饋');
   const [filters, setFilters] = useState<FilterState>(INITIAL_FILTERS);
@@ -71,7 +74,6 @@ export default function App() {
         console.warn('Initial IndexedDB check failed, loading fallback:', err);
       }
 
-      // IndexedDB 為空時載入電商樣本
       if (isMounted) {
         loadSampleById('ecommerce_tw');
       }
@@ -104,7 +106,6 @@ export default function App() {
     setFilters(INITIAL_FILTERS);
     setSelectedReviewIds(new Set());
 
-    // 持久化至 IndexedDB
     const success = await saveReviewsToDB(processedReviews, sample.name);
     setIsDbSynced(success);
   };
@@ -115,7 +116,6 @@ export default function App() {
     setFilters(INITIAL_FILTERS);
     setSelectedReviewIds(new Set());
 
-    // 持久化至 IndexedDB
     const success = await saveReviewsToDB(importedReviews, datasetName);
     setIsDbSynced(success);
   };
@@ -159,7 +159,6 @@ export default function App() {
       return r;
     }));
 
-    // 同步更新 IndexedDB
     for (const id of updatedIds) {
       const target = reviews.find(r => r.id === id);
       if (target) {
@@ -245,7 +244,7 @@ export default function App() {
     return result;
   }, [reviews, filters]);
 
-  // 評分統計數據 (Rating Statistics)
+  // 評分統計數據
   const ratingStats: RatingStats = useMemo(() => {
     const stats: RatingStats = {
       1: 0,
@@ -306,7 +305,7 @@ export default function App() {
   }, [inspectingReview, filteredReviews]);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors">
       
       {/* Header */}
       <Header
@@ -317,22 +316,24 @@ export default function App() {
         activeDatasetName={activeDatasetName}
         totalReviewCount={reviews.length}
         isDbSynced={isDbSynced}
+        theme={theme}
+        onThemeChange={setTheme}
       />
 
       {/* Main Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 space-y-5">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-3.5 sm:py-5 space-y-3.5 sm:space-y-4 min-w-0">
         
         {/* Transparency Banner */}
-        <div className="p-3 rounded-lg bg-slate-900 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-          <div className="flex items-center space-x-2">
-            <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-            <span className="text-slate-300">
-              <strong>確定性規則引擎</strong>：採用瀏覽器原生 Intl.Segmenter 斷詞與客觀情緒詞典，100% 本地 IndexedDB 運算，無假 AI 偽裝。
+        <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs shadow-sm min-w-0">
+          <div className="flex items-center space-x-2 min-w-0">
+            <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+            <span className="text-slate-700 dark:text-slate-300 truncate">
+              <strong>確定性規則引擎</strong>：採用瀏覽器原生 Intl.Segmenter 斷詞與客觀詞典，100% 本地 IndexedDB 運算，無假 AI 偽裝。
             </span>
           </div>
           <button
             onClick={() => setIsMethodologyOpen(true)}
-            className="text-amber-400 hover:text-amber-300 font-medium underline text-left sm:text-right shrink-0"
+            className="text-amber-700 dark:text-amber-400 hover:underline font-medium text-left sm:text-right shrink-0"
           >
             檢視算法透明度報告 →
           </button>
@@ -345,7 +346,7 @@ export default function App() {
         />
 
         {/* 2. ECharts Row: Rating Distribution & Timeline Trend */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 min-w-0">
           <RatingDistributionEChart
             stats={ratingStats}
             selectedRatings={filters.ratings}
@@ -356,15 +357,17 @@ export default function App() {
               setFilters(prev => ({ ...prev, ratings: next }));
             }}
             onClearRatingFilter={() => setFilters(prev => ({ ...prev, ratings: [] }))}
+            isDark={isDark}
           />
 
           <TrendTimelineEChart
             reviews={reviews}
+            isDark={isDark}
           />
         </div>
 
         {/* 3. Deep Analysis Row: Word Frequency (N-gram) & Category Priority Matrix */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 min-w-0">
           <WordFrequencySection
             reviews={reviews}
             selectedToken={filters.selectedToken}
@@ -412,18 +415,16 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-slate-900 bg-slate-950 py-4 text-center text-xs text-slate-500">
+      <footer className="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-4 text-center text-xs text-slate-500 transition-colors">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <div className="flex items-center space-x-2">
-            <span className="font-semibold text-slate-400">Review Signal</span>
+            <span className="font-semibold text-slate-700 dark:text-slate-300">Review Signal</span>
             <span>— 評論研究與顧客之聲專業工作台</span>
           </div>
-          <div className="flex items-center space-x-3 text-[11px] text-slate-500">
-            <span>React + Vite + ECharts + IndexedDB</span>
+          <div className="flex items-center space-x-3 text-[11px] text-slate-400">
+            <span>React 18 + Vite + ECharts + IndexedDB</span>
             <span>•</span>
-            <span>Intl.Segmenter 斷詞</span>
-            <span>•</span>
-            <span>Vercel 部署支援</span>
+            <span>支援雙主題與 9 種尺寸 RWD</span>
           </div>
         </div>
       </footer>

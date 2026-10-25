@@ -3,13 +3,11 @@ import {
   Search, 
   X, 
   RotateCcw, 
-  Filter, 
   ArrowUpDown, 
   Star, 
   Smile, 
   Frown, 
-  Meh, 
-  Tag
+  Meh
 } from 'lucide-react';
 import { FilterState, SentimentType } from '@/types';
 
@@ -55,112 +53,113 @@ export const FilterToolbar: React.FC<FilterToolbarProps> = ({
   };
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-sm space-y-3">
+    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 sm:p-4 shadow-sm space-y-2.5 transition-colors min-w-0">
       
       {/* Top Search & Sort Row */}
-      <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
+      <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center justify-between">
         
         {/* Search Input */}
-        <div className="relative flex-1">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+        <div className="relative flex-1 min-w-0">
+          <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={filters.searchQuery}
             onChange={(e) => onFilterChange({ searchQuery: e.target.value })}
             placeholder="搜尋評論內文、作者、裝置或關鍵字..."
-            className="w-full bg-slate-950 border border-slate-700/80 rounded-xl pl-9 pr-9 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
+            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg pl-8 pr-8 py-1.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500 transition-colors"
           />
           {filters.searchQuery && (
             <button
               onClick={() => onFilterChange({ searchQuery: '' })}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 dark:hover:text-white p-1"
+              aria-label="清除搜尋"
             >
-              <X className="w-3.5 h-3.5" />
+              <X className="w-3 h-3" />
             </button>
           )}
         </div>
 
         {/* Sort Dropdown */}
-        <div className="flex items-center space-x-2 shrink-0">
-          <div className="flex items-center space-x-1.5 text-xs text-slate-400">
-            <ArrowUpDown className="w-3.5 h-3.5" />
-            <span>排序：</span>
+        <div className="flex items-center space-x-1.5 shrink-0 self-end sm:self-auto">
+          <div className="flex items-center space-x-1 text-xs text-slate-500 dark:text-slate-400">
+            <ArrowUpDown className="w-3 h-3" />
+            <span className="hidden sm:inline">排序：</span>
           </div>
           <select
             value={filters.sortBy}
             onChange={(e) => onFilterChange({ sortBy: e.target.value as any })}
-            className="bg-slate-950 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500"
+            className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-2 py-1.5 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-indigo-500 max-w-[150px] truncate"
           >
-            <option value="date_desc">最新發布 (日期降冪)</option>
-            <option value="date_asc">最早發布 (日期升冪)</option>
-            <option value="rating_asc">評分由低至高 (差評優先)</option>
-            <option value="rating_desc">評分由高至低 (好評優先)</option>
-            <option value="sentiment_asc">情緒最負向 (優先修復)</option>
-            <option value="sentiment_desc">情緒最正向 (讚譽優先)</option>
+            <option value="date_desc">最新發布</option>
+            <option value="date_asc">最早發布</option>
+            <option value="rating_asc">評分由低至高</option>
+            <option value="rating_desc">評分由高至低</option>
+            <option value="sentiment_asc">負向優先</option>
+            <option value="sentiment_desc">正向優先</option>
           </select>
         </div>
 
       </div>
 
       {/* Multi-Select Filters Row */}
-      <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-slate-800/80 text-xs">
+      <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-slate-100 dark:border-slate-800 text-xs">
         
         {/* Star Rating Pills */}
-        <span className="text-slate-400 text-[11px] font-medium mr-1">星等：</span>
+        <span className="text-slate-500 dark:text-slate-400 text-[11px] font-medium mr-0.5">星等：</span>
         {[1, 2, 3, 4, 5].map((star) => {
           const active = filters.ratings.includes(star);
           return (
             <button
               key={star}
               onClick={() => toggleRating(star)}
-              className={`px-2 py-1 rounded-lg flex items-center space-x-1 border font-medium transition-all ${
+              className={`px-1.5 py-0.5 rounded flex items-center space-x-0.5 border text-xs font-medium transition-all ${
                 active
-                  ? 'bg-amber-500/20 border-amber-500 text-amber-300'
-                  : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-200'
+                  ? 'bg-amber-100 dark:bg-amber-500/20 border-amber-300 dark:border-amber-500 text-amber-800 dark:text-amber-300'
+                  : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300'
               }`}
             >
               <span>{star}</span>
-              <Star className="w-3 h-3 fill-current text-amber-400" />
+              <Star className="w-2.5 h-2.5 fill-current text-amber-500" />
             </button>
           );
         })}
 
-        <div className="h-4 w-[1px] bg-slate-800 mx-1 hidden sm:block" />
+        <div className="h-3 w-[1px] bg-slate-200 dark:bg-slate-800 mx-1 hidden sm:block" />
 
         {/* Sentiment Pills */}
-        <span className="text-slate-400 text-[11px] font-medium mr-1">情緒：</span>
+        <span className="text-slate-500 dark:text-slate-400 text-[11px] font-medium mr-0.5">情緒：</span>
         {(['negative', 'neutral', 'positive'] as SentimentType[]).map((sent) => {
           const active = filters.sentiment.includes(sent);
           return (
             <button
               key={sent}
               onClick={() => toggleSentiment(sent)}
-              className={`px-2 py-1 rounded-lg flex items-center space-x-1 border font-medium transition-all ${
+              className={`px-1.5 py-0.5 rounded flex items-center space-x-1 border text-xs font-medium transition-all ${
                 active
                   ? sent === 'negative'
-                    ? 'bg-rose-500/20 border-rose-500 text-rose-300'
+                    ? 'bg-rose-100 dark:bg-rose-500/20 border-rose-300 dark:border-rose-500 text-rose-800 dark:text-rose-300'
                     : sent === 'positive'
-                      ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300'
-                      : 'bg-slate-700 border-slate-500 text-slate-200'
-                  : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-200'
+                      ? 'bg-emerald-100 dark:bg-emerald-500/20 border-emerald-300 dark:border-emerald-500 text-emerald-800 dark:text-emerald-300'
+                      : 'bg-slate-200 dark:bg-slate-700 border-slate-300 dark:border-slate-500 text-slate-800 dark:text-slate-200'
+                  : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300'
               }`}
             >
-              {sent === 'negative' && <Frown className="w-3 h-3 text-rose-400" />}
+              {sent === 'negative' && <Frown className="w-3 h-3 text-rose-500" />}
               {sent === 'neutral' && <Meh className="w-3 h-3 text-slate-400" />}
-              {sent === 'positive' && <Smile className="w-3 h-3 text-emerald-400" />}
+              {sent === 'positive' && <Smile className="w-3 h-3 text-emerald-500" />}
               <span>{sent === 'negative' ? '負向' : sent === 'neutral' ? '中性' : '正向'}</span>
             </button>
           );
         })}
 
-        <div className="h-4 w-[1px] bg-slate-800 mx-1 hidden sm:block" />
+        <div className="h-3 w-[1px] bg-slate-200 dark:bg-slate-800 mx-1 hidden sm:block" />
 
         {/* Category Dropdown Filter */}
         {availableCategories.length > 0 && (
           <select
             value={filters.categories[0] || ''}
             onChange={(e) => onFilterChange({ categories: e.target.value ? [e.target.value] : [] })}
-            className="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1 text-xs text-slate-300 focus:outline-none focus:border-indigo-500"
+            className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded px-2 py-0.5 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-indigo-500 max-w-[140px] truncate"
           >
             <option value="">所有問題類別</option>
             {availableCategories.map(cat => (
@@ -174,9 +173,9 @@ export const FilterToolbar: React.FC<FilterToolbarProps> = ({
           <select
             value={filters.tags[0] || ''}
             onChange={(e) => onFilterChange({ tags: e.target.value ? [e.target.value] : [] })}
-            className="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1 text-xs text-slate-300 focus:outline-none focus:border-indigo-500"
+            className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded px-2 py-0.5 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-indigo-500 max-w-[120px] truncate"
           >
-            <option value="">所有手動標籤</option>
+            <option value="">所有標籤</option>
             {availableTags.map(tag => (
               <option key={tag} value={tag}>#{tag}</option>
             ))}
@@ -187,20 +186,19 @@ export const FilterToolbar: React.FC<FilterToolbarProps> = ({
         {isFiltered && (
           <button
             onClick={onResetFilters}
-            className="ml-auto px-2.5 py-1 rounded-lg text-xs font-medium text-rose-400 bg-rose-500/10 border border-rose-500/30 hover:bg-rose-500/20 transition-all flex items-center space-x-1"
+            className="ml-auto px-2 py-0.5 rounded text-xs font-medium text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/30 hover:bg-rose-100 transition-all flex items-center space-x-1"
           >
-            <RotateCcw className="w-3 h-3" />
-            <span>清除所有篩選</span>
+            <RotateCcw className="w-2.5 h-2.5" />
+            <span>清除篩選</span>
           </button>
         )}
 
       </div>
 
       {/* Count Indicator */}
-      <div className="flex items-center justify-between text-xs text-slate-500 pt-1">
+      <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 pt-0.5">
         <div>
-          當前篩選顯示：<strong className="text-white font-mono">{filteredCount}</strong> / {totalCount} 則評論
-          {isFiltered && <span className="ml-2 text-indigo-400 font-mono">(已啟用過濾條件)</span>}
+          當前篩選顯示：<strong className="text-slate-900 dark:text-white font-mono">{filteredCount}</strong> / {totalCount} 則評論
         </div>
       </div>
 

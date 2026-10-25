@@ -2,14 +2,10 @@ import React from 'react';
 import { 
   Star, 
   Smile, 
-  Frown, 
-  Meh, 
   TrendingUp, 
   MessageSquare, 
   Tag, 
-  BarChart2, 
   Award,
-  Zap
 } from 'lucide-react';
 import { Review, RatingStats } from '@/types';
 
@@ -33,44 +29,44 @@ export const OverviewCards: React.FC<OverviewCardsProps> = ({ reviews, ratingSta
   const taggedPercent = ((taggedCount / total) * 100).toFixed(0);
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3.5">
       
       {/* 1. 總評論數 */}
-      <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 shadow-sm relative overflow-hidden group hover:border-slate-700 transition-all">
-        <div className="flex items-center justify-between text-slate-400 mb-1.5">
-          <span className="text-xs font-medium">總樣本數</span>
-          <MessageSquare className="w-4 h-4 text-indigo-400" />
+      <div className="p-3 sm:p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm transition-colors min-w-0">
+        <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-1">
+          <span className="text-[11px] sm:text-xs font-medium truncate">總樣本數</span>
+          <MessageSquare className="w-3.5 h-3.5 text-indigo-500 shrink-0 ml-1" />
         </div>
-        <div className="flex items-baseline space-x-1.5">
-          <span className="text-2xl font-bold text-white tracking-tight">{total}</span>
-          <span className="text-xs text-slate-500 font-mono">則評論</span>
+        <div className="flex items-baseline space-x-1">
+          <span className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">{total}</span>
+          <span className="text-[11px] text-slate-500 font-mono">則</span>
         </div>
-        <div className="mt-2 text-[11px] text-slate-400 flex items-center space-x-1">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-          <span>100% 本地即時分析</span>
+        <div className="mt-1.5 text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 flex items-center space-x-1 truncate">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
+          <span className="truncate">本地即時分析</span>
         </div>
       </div>
 
       {/* 2. 平均評分 */}
-      <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 shadow-sm group hover:border-slate-700 transition-all">
-        <div className="flex items-center justify-between text-slate-400 mb-1.5">
-          <span className="text-xs font-medium">平均星等</span>
-          <Star className="w-4 h-4 text-amber-400 fill-amber-400/20" />
+      <div className="p-3 sm:p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm transition-colors min-w-0">
+        <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-1">
+          <span className="text-[11px] sm:text-xs font-medium truncate">平均星等</span>
+          <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500/20 shrink-0 ml-1" />
         </div>
-        <div className="flex items-baseline space-x-1.5">
-          <span className="text-2xl font-bold text-white tracking-tight">
+        <div className="flex items-baseline space-x-1">
+          <span className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
             {ratingStats.average.toFixed(2)}
           </span>
-          <span className="text-xs text-slate-400">/ 5.0</span>
+          <span className="text-[11px] text-slate-400">/ 5.0</span>
         </div>
-        <div className="mt-2 flex items-center space-x-0.5 text-amber-400">
+        <div className="mt-1.5 flex items-center space-x-0.5 text-amber-500">
           {[1, 2, 3, 4, 5].map((s) => (
             <Star
               key={s}
-              className={`w-3 h-3 ${
+              className={`w-2.5 h-2.5 sm:w-3 sm:h-3 ${
                 s <= Math.round(ratingStats.average)
-                  ? 'fill-amber-400 text-amber-400'
-                  : 'text-slate-600'
+                  ? 'fill-amber-500 text-amber-500'
+                  : 'text-slate-300 dark:text-slate-700'
               }`}
             />
           ))}
@@ -78,75 +74,75 @@ export const OverviewCards: React.FC<OverviewCardsProps> = ({ reviews, ratingSta
       </div>
 
       {/* 3. 滿意度 CSAT */}
-      <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 shadow-sm group hover:border-slate-700 transition-all">
-        <div className="flex items-center justify-between text-slate-400 mb-1.5">
-          <span className="text-xs font-medium">顧客滿意度 (CSAT)</span>
-          <Award className="w-4 h-4 text-emerald-400" />
+      <div className="p-3 sm:p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm transition-colors min-w-0">
+        <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-1">
+          <span className="text-[11px] sm:text-xs font-medium truncate">滿意度 (CSAT)</span>
+          <Award className="w-3.5 h-3.5 text-emerald-500 shrink-0 ml-1" />
         </div>
-        <div className="flex items-baseline space-x-1.5">
-          <span className={`text-2xl font-bold tracking-tight ${
-            ratingStats.csat >= 70 ? 'text-emerald-400' :
-            ratingStats.csat >= 50 ? 'text-amber-400' : 'text-rose-400'
+        <div className="flex items-baseline space-x-1">
+          <span className={`text-xl sm:text-2xl font-bold tracking-tight ${
+            ratingStats.csat >= 70 ? 'text-emerald-600 dark:text-emerald-400' :
+            ratingStats.csat >= 50 ? 'text-amber-600 dark:text-amber-400' : 'text-rose-600 dark:text-rose-400'
           }`}>
             {ratingStats.csat.toFixed(1)}%
           </span>
         </div>
-        <div className="mt-2 text-[11px] text-slate-400 truncate">
+        <div className="mt-1.5 text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 truncate">
           {ratingStats[5] + ratingStats[4]} 則給予 4~5 星
         </div>
       </div>
 
       {/* 4. 淨推薦指數評估 NPS */}
-      <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 shadow-sm group hover:border-slate-700 transition-all">
-        <div className="flex items-center justify-between text-slate-400 mb-1.5">
-          <span className="text-xs font-medium">推薦差額估算</span>
-          <TrendingUp className="w-4 h-4 text-cyan-400" />
+      <div className="p-3 sm:p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm transition-colors min-w-0">
+        <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-1">
+          <span className="text-[11px] sm:text-xs font-medium truncate">推薦差額 NPS</span>
+          <TrendingUp className="w-3.5 h-3.5 text-cyan-600 shrink-0 ml-1" />
         </div>
-        <div className="flex items-baseline space-x-1.5">
-          <span className={`text-2xl font-bold tracking-tight ${
-            ratingStats.npsScore > 0 ? 'text-emerald-400' :
-            ratingStats.npsScore === 0 ? 'text-slate-300' : 'text-rose-400'
+        <div className="flex items-baseline space-x-1">
+          <span className={`text-xl sm:text-2xl font-bold tracking-tight ${
+            ratingStats.npsScore > 0 ? 'text-emerald-600 dark:text-emerald-400' :
+            ratingStats.npsScore === 0 ? 'text-slate-700 dark:text-slate-300' : 'text-rose-600 dark:text-rose-400'
           }`}>
             {ratingStats.npsScore > 0 ? `+${ratingStats.npsScore.toFixed(0)}` : ratingStats.npsScore.toFixed(0)}
           </span>
-          <span className="text-xs text-slate-500 font-mono">pts</span>
+          <span className="text-[11px] text-slate-400 font-mono">pts</span>
         </div>
-        <div className="mt-2 text-[11px] text-slate-400 truncate">
+        <div className="mt-1.5 text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 truncate">
           推廣者 - 批評者指標
         </div>
       </div>
 
       {/* 5. 規則詞典情緒比例 */}
-      <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 shadow-sm group hover:border-slate-700 transition-all">
-        <div className="flex items-center justify-between text-slate-400 mb-1.5">
-          <span className="text-xs font-medium">規則情緒極性</span>
-          <Smile className="w-4 h-4 text-emerald-400" />
+      <div className="p-3 sm:p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm transition-colors min-w-0">
+        <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-1">
+          <span className="text-[11px] sm:text-xs font-medium truncate">規則情緒極性</span>
+          <Smile className="w-3.5 h-3.5 text-emerald-500 shrink-0 ml-1" />
         </div>
-        <div className="flex items-center space-x-2">
-          <span className="text-xs font-semibold text-emerald-400">{posPercent}% 正</span>
-          <span className="text-xs text-slate-500">/</span>
-          <span className="text-xs font-semibold text-rose-400">{negPercent}% 負</span>
+        <div className="flex items-center space-x-1 truncate">
+          <span className="text-[11px] sm:text-xs font-semibold text-emerald-600 dark:text-emerald-400">{posPercent}% 正</span>
+          <span className="text-slate-400">/</span>
+          <span className="text-[11px] sm:text-xs font-semibold text-rose-600 dark:text-rose-400">{negPercent}% 負</span>
         </div>
         {/* Visual Bar */}
-        <div className="mt-2.5 h-1.5 w-full bg-slate-800 rounded-full flex overflow-hidden">
+        <div className="mt-2 h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full flex overflow-hidden">
           <div style={{ width: `${posPercent}%` }} className="bg-emerald-500 h-full" />
-          <div style={{ width: `${((neuCount / total) * 100).toFixed(0)}%` }} className="bg-slate-600 h-full" />
+          <div style={{ width: `${((neuCount / total) * 100).toFixed(0)}%` }} className="bg-slate-400 dark:bg-slate-600 h-full" />
           <div style={{ width: `${negPercent}%` }} className="bg-rose-500 h-full" />
         </div>
       </div>
 
       {/* 6. 標籤註記率 */}
-      <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 shadow-sm group hover:border-slate-700 transition-all">
-        <div className="flex items-center justify-between text-slate-400 mb-1.5">
-          <span className="text-xs font-medium">研究標籤註記</span>
-          <Tag className="w-4 h-4 text-violet-400" />
+      <div className="p-3 sm:p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm transition-colors min-w-0">
+        <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-1">
+          <span className="text-[11px] sm:text-xs font-medium truncate">研究標籤註記</span>
+          <Tag className="w-3.5 h-3.5 text-violet-500 shrink-0 ml-1" />
         </div>
-        <div className="flex items-baseline space-x-1.5">
-          <span className="text-2xl font-bold text-white tracking-tight">{taggedPercent}%</span>
-          <span className="text-xs text-slate-500 font-mono">覆蓋</span>
+        <div className="flex items-baseline space-x-1">
+          <span className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">{taggedPercent}%</span>
+          <span className="text-[11px] text-slate-500 font-mono">覆蓋</span>
         </div>
-        <div className="mt-2 text-[11px] text-slate-400 truncate">
-          {taggedCount} / {total} 則已打手動標籤
+        <div className="mt-1.5 text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 truncate">
+          {taggedCount} / {total} 則已打標
         </div>
       </div>
 

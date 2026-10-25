@@ -15,15 +15,15 @@ test.describe('Review Signal Workspace E2E Tests', () => {
     await expect(page.locator('text=36').first()).toBeVisible();
 
     // 檢查平均評分與 CSAT
-    await expect(page.locator('text=顧客滿意度 (CSAT)')).toBeVisible();
-    await expect(page.locator('text=推薦差額估算')).toBeVisible();
+    await expect(page.locator('text=滿意度 (CSAT)')).toBeVisible();
+    await expect(page.locator('text=推薦差額 NPS')).toBeVisible();
   });
 
   test('2. 應正常渲染 ECharts 圖表元件', async ({ page }) => {
     // 評分星等分佈圖表
     await expect(page.locator('text=評分星等分佈')).toBeVisible();
     // 時間趨勢圖表
-    await expect(page.locator('text=時間趨勢與星等波動')).toBeVisible();
+    await expect(page.locator('text=時間趨勢與星等走勢')).toBeVisible();
 
     // 檢查 ECharts SVG/Canvas 節點存在
     const echartsElements = page.locator('.echarts-for-react');

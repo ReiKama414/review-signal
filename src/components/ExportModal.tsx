@@ -7,8 +7,6 @@ import {
   FileText, 
   Copy, 
   Check, 
-  Sparkles,
-  Layers
 } from 'lucide-react';
 import { Review, RatingStats, CategorySummary, TokenStat } from '@/types';
 import { exportToCSV, exportToJSON, exportToMarkdown, generateMarkdownReport } from '@/lib/export';
@@ -52,48 +50,53 @@ export const ExportModal: React.FC<ExportModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 dark:bg-black/80 backdrop-blur-sm animate-in fade-in duration-150">
       <div 
-        className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden"
+        className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-[calc(100vw-1.5rem)] sm:max-w-2xl max-h-[calc(100vh-2rem)] flex flex-col shadow-2xl overflow-hidden transition-colors"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/60">
-          <div className="flex items-center space-x-2.5">
-            <div className="p-2 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
-              <Download className="w-5 h-5" />
+        <div className="px-4 sm:px-6 py-3.5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-950">
+          <div className="flex items-center space-x-2.5 min-w-0">
+            <div className="p-2 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 text-indigo-600 dark:text-indigo-400 shrink-0">
+              <Download className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
-            <div>
-              <h2 className="text-base font-bold text-white">匯出研究資料與報告</h2>
-              <p className="text-xs text-slate-400">包含已篩選之 {reviews.length} 則評論、手動標籤與分類統計</p>
+            <div className="min-w-0">
+              <h2 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white truncate">
+                匯出研究資料與報告
+              </h2>
+              <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 truncate">
+                包含已篩選之 {reviews.length} 則評論、手動標籤與分類統計
+              </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shrink-0"
+            aria-label="關閉"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Tab Selection */}
-        <div className="flex border-b border-slate-800 bg-slate-950/40 px-6 pt-2">
+        <div className="flex border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 px-4 sm:px-6 pt-2 overflow-x-auto">
           <button
             onClick={() => setActiveTab('options')}
-            className={`pb-2.5 px-3 text-xs font-medium border-b-2 transition-colors ${
+            className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors shrink-0 ${
               activeTab === 'options'
-                ? 'border-indigo-500 text-indigo-400'
-                : 'border-transparent text-slate-400 hover:text-slate-200'
+                ? 'border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400'
+                : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
             }`}
           >
             匯出格式選擇
           </button>
           <button
             onClick={() => setActiveTab('preview')}
-            className={`pb-2.5 px-3 text-xs font-medium border-b-2 transition-colors ${
+            className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors shrink-0 ${
               activeTab === 'preview'
-                ? 'border-indigo-500 text-indigo-400'
-                : 'border-transparent text-slate-400 hover:text-slate-200'
+                ? 'border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400'
+                : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
             }`}
           >
             Markdown 報告即時預覽
@@ -101,9 +104,9 @@ export const ExportModal: React.FC<ExportModalProps> = ({
         </div>
 
         {/* Body */}
-        <div className="p-6 overflow-y-auto space-y-4 flex-1">
+        <div className="p-4 sm:p-6 overflow-y-auto space-y-3 flex-1 min-w-0">
           {activeTab === 'options' ? (
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               
               {/* Option 1: CSV with UTF-8 BOM */}
               <div 
@@ -111,22 +114,22 @@ export const ExportModal: React.FC<ExportModalProps> = ({
                   exportToCSV(reviews, `${datasetName}-reviews.csv`);
                   onClose();
                 }}
-                className="p-4 rounded-xl bg-slate-950 border border-slate-800 hover:border-emerald-500/50 hover:bg-slate-800/50 cursor-pointer transition-all group flex items-start space-x-3.5"
+                className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 cursor-pointer transition-all group flex items-start space-x-3"
               >
-                <div className="p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 shrink-0">
+                <div className="p-2 rounded-lg bg-emerald-100 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-emerald-600 dark:text-emerald-400 shrink-0">
                   <FileSpreadsheet className="w-5 h-5" />
                 </div>
-                <div className="flex-1">
+                <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between">
-                    <h4 className="text-sm font-bold text-white group-hover:text-emerald-300 transition-colors">
+                    <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
                       CSV 試算表 (UTF-8 BOM)
                     </h4>
-                    <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                      Excel 完美開啟不亂碼
+                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 shrink-0">
+                      Excel 繁中不亂碼
                     </span>
                   </div>
-                  <p className="text-xs text-slate-400 mt-1">
-                    包含評論 ID、星等、原聲內文、分類、規則情緒得分、手動標籤與研究員筆記等完整欄位。
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                    包含評論 ID、星等、原聲內文、分類、規則情緒得分、標籤與研究員筆記等完整欄位。
                   </p>
                 </div>
               </div>
@@ -137,22 +140,22 @@ export const ExportModal: React.FC<ExportModalProps> = ({
                   exportToJSON(reviews, `${datasetName}-reviews.json`);
                   onClose();
                 }}
-                className="p-4 rounded-xl bg-slate-950 border border-slate-800 hover:border-indigo-500/50 hover:bg-slate-800/50 cursor-pointer transition-all group flex items-start space-x-3.5"
+                className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-indigo-500 cursor-pointer transition-all group flex items-start space-x-3"
               >
-                <div className="p-2.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 shrink-0">
+                <div className="p-2 rounded-lg bg-indigo-100 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 text-indigo-600 dark:text-indigo-400 shrink-0">
                   <FileCode className="w-5 h-5" />
                 </div>
-                <div className="flex-1">
+                <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between">
-                    <h4 className="text-sm font-bold text-white group-hover:text-indigo-300 transition-colors">
+                    <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                       結構化 JSON 資料庫
                     </h4>
-                    <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-                      開發者 / Pipeline 適用
+                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-indigo-100 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/20 shrink-0">
+                      開發者 / Pipeline
                     </span>
                   </div>
-                  <p className="text-xs text-slate-400 mt-1">
-                    包含斷詞 tokens、否定詞修飾元資料與完整陣列結構，方便接入其他分析工具。
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                    包含斷詞 tokens、否定詞修飾元資料與完整陣列結構。
                   </p>
                 </div>
               </div>
@@ -163,21 +166,21 @@ export const ExportModal: React.FC<ExportModalProps> = ({
                   exportToMarkdown(reviews, ratingStats, categories, topKeywords, `${datasetName}-report.md`);
                   onClose();
                 }}
-                className="p-4 rounded-xl bg-slate-950 border border-slate-800 hover:border-amber-500/50 hover:bg-slate-800/50 cursor-pointer transition-all group flex items-start space-x-3.5"
+                className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-amber-500 cursor-pointer transition-all group flex items-start space-x-3"
               >
-                <div className="p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 shrink-0">
+                <div className="p-2 rounded-lg bg-amber-100 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 text-amber-600 dark:text-amber-400 shrink-0">
                   <FileText className="w-5 h-5" />
                 </div>
-                <div className="flex-1">
+                <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between">
-                    <h4 className="text-sm font-bold text-white group-hover:text-amber-300 transition-colors">
+                    <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
                       Markdown 研究洞察摘要報告 (.md)
                     </h4>
-                    <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                      Notion / Slack / Jira 隨附
+                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20 shrink-0">
+                      Notion / Jira 隨附
                     </span>
                   </div>
-                  <p className="text-xs text-slate-400 mt-1">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                     排版精美之研究簡報，自動計算 CSAT、NPS、緊急修復象限、高頻痛點詞與倫理聲明。
                   </p>
                 </div>
@@ -185,18 +188,18 @@ export const ExportModal: React.FC<ExportModalProps> = ({
 
             </div>
           ) : (
-            <div className="space-y-3">
-              <div className="flex items-center justify-between text-xs text-slate-400">
+            <div className="space-y-2.5">
+              <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
                 <span>報告預覽（支援 GitHub Flavored Markdown）：</span>
                 <button
                   onClick={handleCopyMarkdown}
-                  className="px-2.5 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white flex items-center space-x-1 transition-colors"
+                  className="px-2.5 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white flex items-center space-x-1 transition-colors text-xs"
                 >
-                  {copied ? <Check className="w-3.5 h-3.5 text-white" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span>{copied ? '已複製到剪貼簿！' : '一鍵複製 Markdown'}</span>
+                  {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                  <span>{copied ? '已複製！' : '一鍵複製 Markdown'}</span>
                 </button>
               </div>
-              <pre className="p-4 bg-slate-950 rounded-xl border border-slate-800 font-mono text-xs text-slate-300 overflow-x-auto max-h-72 leading-relaxed whitespace-pre-wrap select-all">
+              <pre className="p-3 bg-slate-50 dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800 font-mono text-xs text-slate-800 dark:text-slate-200 overflow-x-auto max-h-56 sm:max-h-64 leading-relaxed whitespace-pre-wrap break-all select-all">
                 {markdownContent}
               </pre>
             </div>
@@ -204,11 +207,11 @@ export const ExportModal: React.FC<ExportModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-3.5 border-t border-slate-800 bg-slate-950/80 flex items-center justify-between text-xs text-slate-400">
-          <span>匯出資料僅包含當前篩選條件下的評論</span>
+        <div className="px-4 sm:px-6 py-3 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 flex items-center justify-between text-xs text-slate-500">
+          <span>匯出資料僅包含當前篩選之評論</span>
           <button
             onClick={onClose}
-            className="px-4 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700"
+            className="px-3.5 py-1.5 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-300 dark:hover:bg-slate-700"
           >
             關閉
           </button>

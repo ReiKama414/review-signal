@@ -81,7 +81,10 @@
 - **本地持久化**：[IndexedDB](https://developer.mozilla.org/zh-TW/docs/Web/API/IndexedDB_API)（透過 `idb` Promise 封裝）
 - **資料解析**：[PapaParse](https://www.papaparse.com/)
 - **單元測試**：[Vitest](https://vitest.dev/) (20 組單元測試通過)
-- **端到端測試**：[Playwright](https://playwright.dev/) (8 組真實使用者互動測試通過)
+- **端到端測試**：[Playwright](https://playwright.dev/) (17 組端到端測試通過，包含 9 Viewports RWD 與黑白雙主題)
+- **響應式與雙主題**：
+  - 完美相容 9 種主流 Viewport 尺寸（320px、375px、390px、430px、768px、1024px、1280px、1440px、1920px），頁面零水平溢出。
+  - System（跟隨系統）、Light、Dark 黑白雙主題即時切換與持久化。
 
 ---
 
