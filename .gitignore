@@ -3,15 +3,16 @@
 /.pnp
 .pnp.js
 
-# testing
+# testing & reports
 /coverage
+/test-results
+/playwright-report
 
-# next.js
+# build output
+/dist
+/build
 /.next/
 /out/
-
-# production
-/build
 
 # misc
 .DS_Store

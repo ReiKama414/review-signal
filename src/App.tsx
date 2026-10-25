@@ -1,16 +1,13 @@
-'use client';
-
 import React, { useState, useMemo, useEffect } from 'react';
 import { 
   Review, 
   FilterState, 
-  RatingStats, 
-  SentimentType 
+  RatingStats 
 } from '@/types';
 import { Header } from '@/components/Header';
 import { OverviewCards } from '@/components/OverviewCards';
-import { RatingDistributionChart } from '@/components/RatingDistributionChart';
-import { TrendTimelineChart } from '@/components/TrendTimelineChart';
+import { RatingDistributionEChart } from '@/components/RatingDistributionEChart';
+import { TrendTimelineEChart } from '@/components/TrendTimelineEChart';
 import { WordFrequencySection } from '@/components/WordFrequencySection';
 import { CategoryAnalysisSection } from '@/components/CategoryAnalysisSection';
 import { FilterToolbar } from '@/components/FilterToolbar';
@@ -22,17 +19,13 @@ import { ReviewDetailModal } from '@/components/ReviewDetailModal';
 import { SAMPLE_DATASETS, getSampleDataset } from '@/lib/samples';
 import { tokenizeText, extractTokenStats } from '@/lib/tokenizer';
 import { analyzeSentimentRuleBased } from '@/lib/sentiment';
-import { classifyReviewRuleBased, calculateCategorySummaries } from '@/lib/categories';
+import { calculateCategorySummaries } from '@/lib/categories';
 import { 
-  Sparkles, 
-  BarChart3, 
-  Activity, 
-  Layers, 
-  ShieldCheck,
-  RotateCcw,
-  SlidersHorizontal,
-  ChevronDown
-} from 'lucide-react';
+  saveReviewsToDB, 
+  loadReviewsFromDB, 
+  updateReviewInDB 
+} from '@/lib/db';
+import { ShieldCheck, HardDrive } from 'lucide-react';
 
 const INITIAL_FILTERS: FilterState = {
   searchQuery: '',
@@ -48,11 +41,12 @@ const INITIAL_FILTERS: FilterState = {
   sortBy: 'date_desc',
 };
 
-export default function Home() {
+export default function App() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [activeDatasetName, setActiveDatasetName] = useState<string>('電商購物平台顧客真實反饋');
   const [filters, setFilters] = useState<FilterState>(INITIAL_FILTERS);
   const [selectedReviewIds, setSelectedReviewIds] = useState<Set<string>>(new Set());
+  const [isDbSynced, setIsDbSynced] = useState<boolean>(false);
 
   // Modals state
   const [isImportOpen, setIsImportOpen] = useState(false);
@@ -60,16 +54,40 @@ export default function Home() {
   const [isMethodologyOpen, setIsMethodologyOpen] = useState(false);
   const [inspectingReview, setInspectingReview] = useState<Review | null>(null);
 
-  // 初始化載入電商樣本資料
+  // 初始化：優先自 IndexedDB 讀取，若無則載入預設電商資料並持久化
   useEffect(() => {
-    loadSampleById('ecommerce_tw');
+    let isMounted = true;
+
+    async function initWorkspace() {
+      try {
+        const stored = await loadReviewsFromDB();
+        if (stored && stored.reviews.length > 0 && isMounted) {
+          setReviews(stored.reviews);
+          if (stored.datasetName) setActiveDatasetName(stored.datasetName);
+          setIsDbSynced(true);
+          return;
+        }
+      } catch (err) {
+        console.warn('Initial IndexedDB check failed, loading fallback:', err);
+      }
+
+      // IndexedDB 為空時載入電商樣本
+      if (isMounted) {
+        loadSampleById('ecommerce_tw');
+      }
+    }
+
+    initWorkspace();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  const loadSampleById = (sampleId: string) => {
+  const loadSampleById = async (sampleId: string) => {
     const sample = getSampleDataset(sampleId);
     if (!sample) return;
 
-    // 將樣本文本進行標準分詞與規則情緒分析
     const processedReviews: Review[] = sample.reviews.map((r, index) => {
       const tokens = tokenizeText(r.content);
       const sentiment = analyzeSentimentRuleBased(tokens, r.content);
@@ -85,49 +103,71 @@ export default function Home() {
     setActiveDatasetName(sample.name);
     setFilters(INITIAL_FILTERS);
     setSelectedReviewIds(new Set());
+
+    // 持久化至 IndexedDB
+    const success = await saveReviewsToDB(processedReviews, sample.name);
+    setIsDbSynced(success);
   };
 
-  // 當使用者匯入自訂 CSV/JSON 時觸發
-  const handleImportSuccess = (importedReviews: Review[], datasetName: string) => {
+  const handleImportSuccess = async (importedReviews: Review[], datasetName: string) => {
     setReviews(importedReviews);
     setActiveDatasetName(datasetName);
     setFilters(INITIAL_FILTERS);
     setSelectedReviewIds(new Set());
+
+    // 持久化至 IndexedDB
+    const success = await saveReviewsToDB(importedReviews, datasetName);
+    setIsDbSynced(success);
   };
 
   // 評論標籤更新 (手動標籤)
-  const handleUpdateReviewTags = (reviewId: string, tags: string[]) => {
+  const handleUpdateReviewTags = async (reviewId: string, tags: string[]) => {
     setReviews(prev => prev.map(r => r.id === reviewId ? { ...r, tags } : r));
     if (inspectingReview && inspectingReview.id === reviewId) {
       setInspectingReview(prev => prev ? { ...prev, tags } : null);
     }
+    await updateReviewInDB(reviewId, { tags });
   };
 
   // 評論分類更新
-  const handleUpdateReviewCategory = (reviewId: string, category: string) => {
+  const handleUpdateReviewCategory = async (reviewId: string, category: string) => {
     setReviews(prev => prev.map(r => r.id === reviewId ? { ...r, category } : r));
     if (inspectingReview && inspectingReview.id === reviewId) {
       setInspectingReview(prev => prev ? { ...prev, category } : null);
     }
+    await updateReviewInDB(reviewId, { category });
   };
 
   // 評論研究員筆記更新
-  const handleUpdateReviewNotes = (reviewId: string, notes: string) => {
+  const handleUpdateReviewNotes = async (reviewId: string, notes: string) => {
     setReviews(prev => prev.map(r => r.id === reviewId ? { ...r, notes } : r));
     if (inspectingReview && inspectingReview.id === reviewId) {
       setInspectingReview(prev => prev ? { ...prev, notes } : null);
     }
+    await updateReviewInDB(reviewId, { notes });
   };
 
   // 批次新增標籤
-  const handleBatchAddTag = (newTag: string) => {
+  const handleBatchAddTag = async (newTag: string) => {
+    const updatedIds: string[] = [];
     setReviews(prev => prev.map(r => {
       if (selectedReviewIds.has(r.id)) {
+        updatedIds.push(r.id);
         const nextTags = r.tags.includes(newTag) ? r.tags : [...r.tags, newTag];
         return { ...r, tags: nextTags };
       }
       return r;
     }));
+
+    // 同步更新 IndexedDB
+    for (const id of updatedIds) {
+      const target = reviews.find(r => r.id === id);
+      if (target) {
+        const nextTags = target.tags.includes(newTag) ? target.tags : [...target.tags, newTag];
+        await updateReviewInDB(id, { tags: nextTags });
+      }
+    }
+
     setSelectedReviewIds(new Set());
   };
 
@@ -150,7 +190,6 @@ export default function Home() {
   const filteredReviews = useMemo(() => {
     let result = [...reviews];
 
-    // 1. 搜尋字串
     if (filters.searchQuery.trim()) {
       const q = filters.searchQuery.toLowerCase().trim();
       result = result.filter(r => 
@@ -163,33 +202,27 @@ export default function Home() {
       );
     }
 
-    // 2. 星等篩選
     if (filters.ratings.length > 0) {
       result = result.filter(r => filters.ratings.includes(r.rating));
     }
 
-    // 3. 情緒極性篩選
     if (filters.sentiment.length > 0) {
       result = result.filter(r => filters.sentiment.includes(r.sentiment.label));
     }
 
-    // 4. 問題分類篩選
     if (filters.categories.length > 0) {
       result = result.filter(r => filters.categories.includes(r.category));
     }
 
-    // 5. 標籤篩選
     if (filters.tags.length > 0) {
       result = result.filter(r => filters.tags.some(t => r.tags.includes(t)));
     }
 
-    // 6. 字詞與 N-gram 篩選
     if (filters.selectedToken) {
       const token = filters.selectedToken.toLowerCase();
       result = result.filter(r => r.content.toLowerCase().includes(token));
     }
 
-    // 7. 排序
     result.sort((a, b) => {
       switch (filters.sortBy) {
         case 'date_desc':
@@ -212,7 +245,7 @@ export default function Home() {
     return result;
   }, [reviews, filters]);
 
-  // 計算評分統計數據 (Rating Statistics)
+  // 評分統計數據 (Rating Statistics)
   const ratingStats: RatingStats = useMemo(() => {
     const stats: RatingStats = {
       1: 0,
@@ -243,18 +276,15 @@ export default function Home() {
 
     stats.average = Number((totalRating / reviews.length).toFixed(2));
 
-    // 計算中位數
     ratingValues.sort((a, b) => a - b);
     const mid = Math.floor(ratingValues.length / 2);
     stats.median = ratingValues.length % 2 !== 0 
       ? ratingValues[mid] 
       : Math.round((ratingValues[mid - 1] + ratingValues[mid]) / 2);
 
-    // CSAT (% of 4-5 stars)
     const satisfied = stats[4] + stats[5];
     stats.csat = Number(((satisfied / reviews.length) * 100).toFixed(1));
 
-    // NPS 估算 (% promoters 4-5 - % detractors 1-2)
     const detractors = stats[1] + stats[2];
     const nps = ((satisfied - detractors) / reviews.length) * 100;
     stats.npsScore = Number(nps.toFixed(1));
@@ -262,7 +292,6 @@ export default function Home() {
     return stats;
   }, [reviews]);
 
-  // 計算分類與高頻字詞 (供報表使用)
   const categorySummaries = useMemo(() => {
     return calculateCategorySummaries(reviews);
   }, [reviews]);
@@ -271,7 +300,6 @@ export default function Home() {
     return extractTokenStats(reviews, 1, 20);
   }, [reviews]);
 
-  // 單則評論深層檢視 Navigation
   const inspectingIndex = useMemo(() => {
     if (!inspectingReview) return -1;
     return filteredReviews.findIndex(r => r.id === inspectingReview.id);
@@ -280,7 +308,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
       
-      {/* Top Header */}
+      {/* Header */}
       <Header
         onOpenImport={() => setIsImportOpen(true)}
         onOpenExport={() => setIsExportOpen(true)}
@@ -288,31 +316,25 @@ export default function Home() {
         onLoadSample={loadSampleById}
         activeDatasetName={activeDatasetName}
         totalReviewCount={reviews.length}
+        isDbSynced={isDbSynced}
       />
 
-      {/* Main Workspace Content */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      {/* Main Container */}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 space-y-5">
         
-        {/* Banner: Transparent Methodology Disclosure Notice */}
-        <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-          <div className="flex items-center space-x-2.5">
-            <div className="p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
-              <ShieldCheck className="w-4 h-4" />
-            </div>
-            <div>
-              <span className="font-semibold text-slate-200">
-                本系統完全基於本地詞典規則與確定性斷詞運算
-              </span>
-              <span className="text-slate-400 ml-1.5 hidden md:inline">
-                • 100% 資料保密、零黑箱預測、不消耗 Token、拒絕偽裝 AI
-              </span>
-            </div>
+        {/* Transparency Banner */}
+        <div className="p-3 rounded-lg bg-slate-900 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+          <div className="flex items-center space-x-2">
+            <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+            <span className="text-slate-300">
+              <strong>確定性規則引擎</strong>：採用瀏覽器原生 Intl.Segmenter 斷詞與客觀情緒詞典，100% 本地 IndexedDB 運算，無假 AI 偽裝。
+            </span>
           </div>
           <button
             onClick={() => setIsMethodologyOpen(true)}
-            className="text-amber-400 hover:text-amber-300 font-medium underline shrink-0 text-left sm:text-right"
+            className="text-amber-400 hover:text-amber-300 font-medium underline text-left sm:text-right shrink-0"
           >
-            檢視算法透明度報告與公式 →
+            檢視算法透明度報告 →
           </button>
         </div>
 
@@ -322,9 +344,9 @@ export default function Home() {
           ratingStats={ratingStats} 
         />
 
-        {/* 2. Top Charts Row: Rating Distribution & Timeline Trend */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <RatingDistributionChart
+        {/* 2. ECharts Row: Rating Distribution & Timeline Trend */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <RatingDistributionEChart
             stats={ratingStats}
             selectedRatings={filters.ratings}
             onToggleRating={(star) => {
@@ -336,13 +358,13 @@ export default function Home() {
             onClearRatingFilter={() => setFilters(prev => ({ ...prev, ratings: [] }))}
           />
 
-          <TrendTimelineChart
+          <TrendTimelineEChart
             reviews={reviews}
           />
         </div>
 
         {/* 3. Deep Analysis Row: Word Frequency (N-gram) & Category Priority Matrix */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <WordFrequencySection
             reviews={reviews}
             selectedToken={filters.selectedToken}
@@ -390,18 +412,18 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-slate-900 bg-slate-950 py-6 text-center text-xs text-slate-500">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <footer className="border-t border-slate-900 bg-slate-950 py-4 text-center text-xs text-slate-500">
+        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <div className="flex items-center space-x-2">
             <span className="font-semibold text-slate-400">Review Signal</span>
-            <span>— 現代化顧客之聲與評論研究工作台</span>
+            <span>— 評論研究與顧客之聲專業工作台</span>
           </div>
-          <div className="flex items-center space-x-4 text-[11px] text-slate-500">
-            <span>支援 Vercel 零配置部署</span>
+          <div className="flex items-center space-x-3 text-[11px] text-slate-500">
+            <span>React + Vite + ECharts + IndexedDB</span>
             <span>•</span>
             <span>Intl.Segmenter 斷詞</span>
             <span>•</span>
-            <span>可解釋情緒規則</span>
+            <span>Vercel 部署支援</span>
           </div>
         </div>
       </footer>

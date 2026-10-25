@@ -79,9 +79,9 @@ export function convertRowsToReviews(
 
     // 處理評分 (支援 1~5 星，如果是 1~10 或百分比則標準化為 1~5)
     let rawRating = Number(row[mapping.rating]);
-    if (isNaN(rawRating) || rawRating <= 0) {
-      // 嘗試從文字中解析星等
-      const starMatch = String(row[mapping.rating] || '').match(/(\d(\.\d)?)/);
+    if (isNaN(rawRating)) {
+      // 嘗試從文字中解析星等 (例如 "4.5顆星" 或 "5 stars")
+      const starMatch = String(row[mapping.rating] || '').match(/(\d+(\.\d+)?)/);
       rawRating = starMatch ? parseFloat(starMatch[1]) : 3;
     }
     if (rawRating > 5 && rawRating <= 10) {
