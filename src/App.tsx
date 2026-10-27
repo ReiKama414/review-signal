@@ -325,9 +325,9 @@ export default function App() {
         
         {/* Transparency Banner */}
         <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs shadow-sm min-w-0">
-          <div className="flex items-center space-x-2 min-w-0">
-            <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-            <span className="text-slate-700 dark:text-slate-300 truncate">
+          <div className="flex items-start sm:items-center space-x-2 min-w-0">
+            <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5 sm:mt-0" />
+            <span className="text-slate-700 dark:text-slate-300 break-words">
               <strong>確定性規則引擎</strong>：採用瀏覽器原生 Intl.Segmenter 斷詞與客觀詞典，100% 本地 IndexedDB 運算，無假 AI 偽裝。
             </span>
           </div>

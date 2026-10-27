@@ -65,11 +65,11 @@ export const TrendTimelineEChart: React.FC<TrendTimelineEChartProps> = ({ review
   const option = {
     backgroundColor: 'transparent',
     grid: {
-      top: 35,
-      right: 35,
-      bottom: 20,
-      left: 35,
-      containLabel: false,
+      top: 42,
+      right: 20,
+      bottom: 26,
+      left: 10,
+      containLabel: true,
     },
     tooltip: {
       trigger: 'axis',
@@ -80,10 +80,11 @@ export const TrendTimelineEChart: React.FC<TrendTimelineEChartProps> = ({ review
     },
     legend: {
       data: ['正面評論', '中性評論', '負面評論', '平均星等'],
-      top: 0,
-      textStyle: { color: isDark ? '#94a3b8' : '#64748b', fontSize: 10 },
-      itemWidth: 10,
-      itemHeight: 7,
+      top: 4,
+      left: 'center',
+      textStyle: { color: isDark ? '#94a3b8' : '#64748b', fontSize: 11 },
+      itemWidth: 12,
+      itemHeight: 8,
     },
     xAxis: {
       type: 'category',
@@ -94,8 +95,8 @@ export const TrendTimelineEChart: React.FC<TrendTimelineEChartProps> = ({ review
     yAxis: [
       {
         type: 'value',
-        name: '量',
-        nameTextStyle: { color: isDark ? '#64748b' : '#94a3b8', fontSize: 9 },
+        name: '量 (則)',
+        nameTextStyle: { color: isDark ? '#64748b' : '#94a3b8', fontSize: 10 },
         splitLine: { lineStyle: { color: isDark ? '#1e293b' : '#f1f5f9' } },
         axisLabel: { color: isDark ? '#94a3b8' : '#64748b', fontSize: 10 },
         minInterval: 1,
@@ -103,7 +104,7 @@ export const TrendTimelineEChart: React.FC<TrendTimelineEChartProps> = ({ review
       {
         type: 'value',
         name: '星等',
-        nameTextStyle: { color: '#f59e0b', fontSize: 9 },
+        nameTextStyle: { color: '#f59e0b', fontSize: 10 },
         min: 1,
         max: 5,
         splitLine: { show: false },
@@ -146,31 +147,51 @@ export const TrendTimelineEChart: React.FC<TrendTimelineEChartProps> = ({ review
     ],
   };
 
+  const totalReviewsInTrend = trendData.reduce((sum, d) => sum + d.count, 0);
+
   return (
     <div className="p-3.5 sm:p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between transition-colors min-w-0">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-1 gap-2">
-        <div className="min-w-0">
-          <div className="flex items-center space-x-1.5">
-            <h3 className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-white tracking-tight truncate">
-              時間趨勢與星等走勢
-            </h3>
-            <span className="text-[10px] text-slate-500 font-mono px-1 rounded bg-slate-100 dark:bg-slate-800">
-              ECharts
-            </span>
-          </div>
-          <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
-            堆疊柱狀呈現各情緒量、折線呈現每日平均星等
-          </p>
+      
+      {/* 1. Header: 標題區 */}
+      <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
+        <div className="flex items-center space-x-1.5 min-w-0">
+          <h3 className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-white tracking-tight break-words">
+            時間趨勢與星等走勢
+          </h3>
+          <span className="text-[10px] text-slate-500 font-mono px-1 rounded bg-slate-100 dark:bg-slate-800 shrink-0">
+            ECharts
+          </span>
         </div>
-        <div className="flex items-center space-x-1 text-[11px] text-slate-500 dark:text-slate-400 shrink-0">
+
+        <div className="flex items-center space-x-1 text-xs text-slate-500 dark:text-slate-400 shrink-0">
           <Calendar className="w-3.5 h-3.5 text-indigo-500" />
-          <span>{trendData.length} 節點</span>
+          <span>{trendData.length} 個觀測時段</span>
         </div>
       </div>
 
-      {/* Chart Canvas */}
-      <div className="h-44 sm:h-48 w-full min-w-0 overflow-hidden">
+      {/* 2. Description: 說明區 */}
+      <p className="text-[11px] text-slate-500 dark:text-slate-400 break-words mb-2">
+        堆疊柱狀呈現各情緒量、折線呈現每日平均星等，快速捕捉產品客訴事件爆發點
+      </p>
+
+      {/* 3. Statistics: 獨立統計數值區 */}
+      <div className="py-2 px-2.5 mb-2 rounded-lg bg-slate-50 dark:bg-slate-950/60 border border-slate-100 dark:border-slate-800/80 flex flex-wrap items-center justify-between gap-2 text-xs">
+        <div className="flex items-baseline space-x-1 min-w-[75px]">
+          <span className="text-[11px] text-slate-500 dark:text-slate-400">涵蓋樣本：</span>
+          <strong className="text-slate-900 dark:text-white font-semibold">{totalReviewsInTrend} 則</strong>
+        </div>
+        <div className="flex items-baseline space-x-1 min-w-[75px]">
+          <span className="text-[11px] text-slate-500 dark:text-slate-400">起始日期：</span>
+          <span className="text-slate-700 dark:text-slate-300 font-mono">{dates[0] || 'N/A'}</span>
+        </div>
+        <div className="flex items-baseline space-x-1 min-w-[75px]">
+          <span className="text-[11px] text-slate-500 dark:text-slate-400">最新日期：</span>
+          <span className="text-slate-700 dark:text-slate-300 font-mono">{dates[dates.length - 1] || 'N/A'}</span>
+        </div>
+      </div>
+
+      {/* 4. Chart: 圖表繪製區 */}
+      <div className="min-h-[220px] h-52 sm:h-56 w-full min-w-0">
         {trendData.length === 0 ? (
           <div className="h-full flex items-center justify-center text-xs text-slate-400">
             目前無足夠日期資料
@@ -185,13 +206,13 @@ export const TrendTimelineEChart: React.FC<TrendTimelineEChartProps> = ({ review
         )}
       </div>
 
-      {/* Footer */}
-      <div className="mt-1 pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
-        <span className="truncate">
-          紅條突起通常對應改版異常或物流延遲
+      {/* 5. Legend / Footer: 補充資訊與異常解讀 */}
+      <div className="mt-2 pt-2 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500 dark:text-slate-400">
+        <span className="break-words">
+          紅條突起通常對應重大改版異常、API 故障或物流突發延遲
         </span>
-        <span className="text-amber-500 font-mono shrink-0 ml-2">
-          黃線：平均星等
+        <span className="text-amber-500 font-mono font-medium shrink-0">
+          黃線：平均星等 (1.0~5.0)
         </span>
       </div>
     </div>

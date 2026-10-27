@@ -343,16 +343,16 @@ export const ReviewList: React.FC<ReviewListProps> = ({
                   </div>
 
                   {/* Researcher Note Preview & Detail Trigger */}
-                  <div className="flex items-center space-x-2 text-xs ml-auto">
+                  <div className="flex flex-wrap items-center gap-2 text-xs">
                     {review.notes && (
-                      <span className="text-amber-700 dark:text-amber-400/90 italic text-[10px] truncate max-w-[130px] sm:max-w-[200px]" title={review.notes}>
+                      <span className="text-amber-700 dark:text-amber-400/90 italic text-[10px] break-words max-w-[150px] sm:max-w-[220px]" title={review.notes}>
                         筆記：{review.notes}
                       </span>
                     )}
 
                     <button
                       onClick={() => onSelectReviewDetail(review)}
-                      className="text-indigo-600 dark:text-indigo-400 hover:underline flex items-center space-x-1 text-[11px] font-medium"
+                      className="text-indigo-600 dark:text-indigo-400 hover:underline flex items-center space-x-1 text-[11px] font-medium shrink-0"
                     >
                       <Edit3 className="w-3 h-3" />
                       <span>深入檢視</span>

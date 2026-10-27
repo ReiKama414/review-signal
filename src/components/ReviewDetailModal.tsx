@@ -65,18 +65,18 @@ export const ReviewDetailModal: React.FC<ReviewDetailModalProps> = ({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="px-4 sm:px-6 py-3.5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-950">
-          <div className="flex items-center space-x-2.5 min-w-0">
-            <div className="flex items-center space-x-0.5 px-2 py-0.5 rounded bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 text-amber-600 dark:text-amber-400 font-bold text-xs sm:text-sm shrink-0">
+        <div className="px-4 sm:px-6 py-3.5 border-b border-slate-200 dark:border-slate-800 flex items-start justify-between gap-2 bg-slate-50 dark:bg-slate-950">
+          <div className="flex items-start space-x-2.5 min-w-0">
+            <div className="flex items-center space-x-0.5 px-2 py-0.5 rounded bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 text-amber-600 dark:text-amber-400 font-bold text-xs sm:text-sm shrink-0 mt-0.5">
               <span>{review.rating}</span>
               <Star className="w-3.5 h-3.5 fill-current" />
             </div>
             <div className="min-w-0">
-              <h2 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white flex items-center space-x-1.5 truncate">
+              <h2 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white flex flex-wrap items-center gap-1.5 break-words">
                 <span>評論深度研究與詞義特徵</span>
                 <span className="font-mono text-[10px] text-slate-400">#{review.id}</span>
               </h2>
-              <p className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 truncate">
+              <p className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 break-words mt-0.5">
                 發布於 {review.date} {review.author ? `• 作者：${review.author}` : ''}
               </p>
             </div>

@@ -59,15 +59,15 @@ export const WordFrequencySection: React.FC<WordFrequencySectionProps> = ({
       {/* Header & Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
         <div className="min-w-0">
-          <div className="flex items-center space-x-1.5">
-            <h3 className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-white tracking-tight truncate">
+          <div className="flex flex-wrap items-center gap-1.5">
+            <h3 className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-white tracking-tight break-words">
               字詞頻率與 N-gram 挖掘
             </h3>
-            <span className="text-[10px] font-mono px-1 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+            <span className="text-[10px] font-mono px-1 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 shrink-0">
               分詞探勘
             </span>
           </div>
-          <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
+          <p className="text-[11px] text-slate-500 dark:text-slate-400 break-words mt-0.5">
             點擊任一詞彙可鑽取（Drill-down）篩選評論清單
           </p>
         </div>

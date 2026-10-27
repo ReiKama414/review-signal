@@ -66,7 +66,7 @@ export const Header: React.FC<HeaderProps> = ({
                 VoC
               </span>
               <span 
-                className="hidden md:inline-flex items-center space-x-1 text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800"
+                className="hidden xl:inline-flex items-center space-x-1 text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800"
                 title="IndexedDB 本機持久化已啟用"
               >
                 <HardDrive className="w-2.5 h-2.5" />
@@ -102,8 +102,8 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        {/* Right Desktop Actions */}
-        <div className="hidden sm:flex items-center space-x-2">
+        {/* Right Desktop Actions (>= 1024px) */}
+        <div className="hidden lg:flex items-center space-x-2">
           
           {/* Methodology Disclosure Button */}
           <button
@@ -189,8 +189,8 @@ export const Header: React.FC<HeaderProps> = ({
 
         </div>
 
-        {/* Mobile Header Controls (< 640px) */}
-        <div className="flex sm:hidden items-center space-x-1.5">
+        {/* Mobile & Tablet Header Controls (< 1024px) */}
+        <div className="flex lg:hidden items-center space-x-1.5">
           {/* Quick Theme Cycle Button */}
           <button
             onClick={cycleTheme}
@@ -219,15 +219,15 @@ export const Header: React.FC<HeaderProps> = ({
 
       </div>
 
-      {/* Mobile Drawer / Collapsible Menu */}
+      {/* Mobile Drawer / Collapsible Menu (< 1024px) */}
       {mobileMenuOpen && (
-        <div className="sm:hidden border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-3 space-y-3 animate-in slide-in-from-top-2 duration-150">
+        <div className="lg:hidden border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-3 space-y-3 animate-in slide-in-from-top-2 duration-150">
           
           {/* Active Dataset Display & Switcher */}
           <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs">
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex flex-wrap items-center justify-between gap-1 mb-2">
               <span className="text-slate-500 dark:text-slate-400">目前資料集：</span>
-              <span className="font-semibold text-slate-800 dark:text-slate-200 truncate">
+              <span className="font-semibold text-slate-800 dark:text-slate-200 break-words">
                 {activeDatasetName} ({totalReviewCount} 筆)
               </span>
             </div>

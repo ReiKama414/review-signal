@@ -15,8 +15,8 @@ test.describe('Review Signal Workspace E2E Tests', () => {
     await expect(page.locator('text=36').first()).toBeVisible();
 
     // 檢查平均評分與 CSAT
-    await expect(page.locator('text=滿意度 (CSAT)')).toBeVisible();
-    await expect(page.locator('text=推薦差額 NPS')).toBeVisible();
+    await expect(page.locator('text=滿意度 (CSAT)').first()).toBeVisible();
+    await expect(page.locator('text=推薦差額 NPS').first()).toBeVisible();
   });
 
   test('2. 應正常渲染 ECharts 圖表元件', async ({ page }) => {
