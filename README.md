@@ -1,136 +1,170 @@
-# 📡 Review Signal — 專業評論研究與顧客之聲 (VoC) 工作台
+# Review Signal
 
-> **正式可用、客觀統計、本地隱私、拒絕偽裝 AI 的評論研究工作台**  
-> 專為產品經理 (Product Managers)、UX 研究員 (UX Researchers) 與客服體驗團隊設計。  
-> 採用 **React 18 + TypeScript + Vite + Tailwind CSS + ECharts + IndexedDB** 架構，支援 Vercel 零配置秒速發布。
+> **顧客之聲 (VoC) 與評論研究專業工作台**，整合原生繁中斷詞、確定性詞典情感分析、N-gram 語塊探勘、四象限修復優先級矩陣與 ECharts 視覺化
 
----
-
-## 🌟 核心設計原則與功能特色
-
-### 1. 🔍 清楚區分「字詞規則」與「真正情緒模型」（科學倫理堅持）
-- **拒絕假裝 AI (No Fake AI)**：商業軟體常將簡單的正負向字詞計數偽稱為「深度 AI 語意理解」。Review Signal 恪守研究工具的客觀真實性，明確標示當前引擎為 **確定性規則詞典 (Deterministic Rule-Based NLP)**。
-- **滑動視窗修飾機制 (Context Window Modifiers)**：
-  - **否定詞翻轉 (Negation)**：偵測「不、沒、無、未、無法」，動態反轉情緒極性（例如：「好用 (+1.0)」→「不好用 (-1.0)」）。
-  - **程度副詞放大 (Intensifier)**：偵測「超、非常、極度、太、無比」，乘上 1.4x ~ 1.8x 強度倍率（例如：「超爛 (-1.1 × 1.5 = -1.65)」）。
-- **完整數學證據鏈 (Auditable Evidence Tree)**：點擊任一評論，可即時展開該評分的平滑雙曲歸一化數學公式與命中的規則詞清單：
-  $$\text{Normalized Score} = \frac{\text{PositiveScore} - \text{NegativeScore}}{\text{Total} + 0.5} \in [-1.0, +1.0]$$
-
-### 2. 🧩 現代瀏覽器原生中文斷詞與 N-gram 探勘
-- **瀏覽器原生 Intl.Segmenter**：零下載外部 20MB 權重或巨型辭典檔，直接調用瀏覽器原生繁簡中文斷詞引擎。
-- **領域專屬複合詞重組**：內建針對台灣電商、SaaS 軟體與外送服務業的 200+ 專業領域複合詞庫（如「閃退」、「當機」、「客服人員」、「退貨退款」、「外送員」、「折扣碼」），避免詞組被切碎。
-- **N-gram 探勘**：
-  - **單字詞 (1-gram)**：快速掌握高頻正負向核心痛點。
-  - **二元組 (2-gram)**：挖掘語境搭配（如「更新後 閃退」、「物流 超慢」）。
-  - **三元組 (3-gram)**：深層語塊（如「客服 都 沒回」、「包裝 嚴重 破損」）。
-- **雙向聯動鑽取 (Cross-Filtering Drill-Down)**：在詞彙雲點擊任意單詞或 N-gram，即時過濾出包含該關鍵詞的所有顧客原聲評論。
-- **停用詞管理 (Custom Stopwords)**：內建中英停用詞庫，並支援研究員即時新增／移除自訂停用詞。
-
-### 3. 📊 ECharts 專業可視化圖表
-- **評分星等直方圖 (ECharts Bar)**：直觀呈現 1~5 星分佈比例、中位數、顧客滿意度 (CSAT, % 4-5 星) 與淨推薦估算 (NPS Proxy)。點擊柱狀圖可直接連動過濾評論。
-- **時序走勢圖 (ECharts Composed Timeline)**：
-  - 左 Y 軸：正面、中性、負面堆疊柱狀圖（紅條突起即代表爆發客訴事件）。
-  - 右 Y 軸：每日平均星等波動折線（1~5 星滿意度趨勢）。
-
-### 4. 🚨 問題分類統計與修復優先級矩陣 (Priority Action Matrix)
-- **客觀規則分類歸因**：
-  - ⚡ 功能異常與閃退 (Bug & Crash)
-  - 🚚 物流配送與包裝 (Delivery & Packaging)
-  - 🎧 客戶服務與售後 (Customer Support)
-  - 🎨 介面設計與易用性 (UI/UX)
-  - 💰 價格費用與退款 (Pricing & Refund)
-  - 📦 商品品質與期待 (Product Quality)
-  - 🌟 滿意與產品讚譽 (Praise & Delight)
-- **四象限優先級判定**：結合「評論量佔比 (Volume)」與「平均滿意度 (Avg Rating)」，自動標示：
-  - 🔴 **緊急修復 (Critical Action)**：高客訴量且評分低於 2.5 星之致命問題。
-  - 🟠 **重點關注 (High Priority)**：影響範圍廣或評分持續低迷之模組。
-  - 🔵 **持續優化 (Medium Priority)**：一般體驗改進。
-  - 🟢 **表現良好 (Healthy)**：高評分強項。
-
-### 5. 💾 IndexedDB 本地持久化儲存
-- 採用標準 `idb` 異步資料庫驅動。
-- 使用者匯入的評論資料、自訂標籤（Tags）、分類調整以及研究員撰寫的質化筆記（Researcher Notes），**在重新整理瀏覽器或重啟電腦後皆完整保留，100% 離線可用且無隱私外洩風險**。
-
-### 6. 🏷️ 手動標籤、質化筆記與批量作業
-- **手動標籤系統**：研究員可即時為個別評論新增自訂標籤（如 `#雙11塞車`、`#iOS18改版`、`#待轉工程團隊`）。
-- **批量選取與打標**：勾選多筆評論，一鍵批量賦予共同標籤。
-- **質化研究員筆記 (Researcher Annotation)**：每則評論可撰寫假說紀錄、根因推論 (Root Cause) 與跨部門處理指示。
-
-### 7. 📁 資料匯入、匯出與豐富範例
-- **匯入支援**：
-  - 拖曳上傳 CSV（支援 UTF-8、自動偵測逗號／分號／Tab）。
-  - 上傳 JSON（支援陣列或嵌套結構）。
-  - 剪貼簿直接貼上文字。
-  - 智慧欄位自動對應（自動辨識 rating, content, date, category, tags），異常評分自動標準化（如 10 分制轉 5 分制、負數過濾）。
-- **內建 3 大豐富情境示例資料**：
-  1. 🛒 **台灣電商購物 App 顧客評論**：物流時效、改版閃退、折扣碼無效、退貨爭議。
-  2. 💼 **SaaS 敏捷協作工具用戶反饋**：API 限流、Cmd+K 快捷鍵、離線衝突、定價爭議。
-  3. 🍜 **外送美食與生鮮快送評論**：外送延誤、湯汁傾倒、備註忽視、秒退服務。
-- **全方位匯出能力**：
-  - **CSV (UTF-8 with BOM)**：在微軟 Excel 中直接開啟繁體中文，**保證絕不亂碼**！
-  - **JSON 資料庫**：乾淨結構化資料。
-  - **Markdown 完整研究報告**：自動生成包含 KPI 摘要、緊急修復清單、Top 痛點關鍵字與倫理聲明的專業研究簡報。
+<p align="center">
+  <a href="https://github.com/ReiKama414/review-signal">GitHub</a> ·
+  <a href="https://reikama414.vercel.app/">個人網站</a> ·
+  <a href="#快速開始">快速開始</a> ·
+  <a href="#測試與驗證">測試驗證</a> ·
+  <a href="#license--權限">License</a>
+</p>
 
 ---
 
-## 🛠️ 技術棧 (Tech Stack)
+## 為什麼做
 
-- **前端框架**：[React 18](https://react.dev/) + [TypeScript 5](https://www.typescriptlang.org/) + [Vite 5](https://vitejs.dev/)
-- **樣式系統**：[Tailwind CSS](https://tailwindcss.com/)（專業高對比工作台風格）
-- **可視化圖表**：[Apache ECharts 5](https://echarts.apache.org/) + `echarts-for-react`
-- **本地持久化**：[IndexedDB](https://developer.mozilla.org/zh-TW/docs/Web/API/IndexedDB_API)（透過 `idb` Promise 封裝）
-- **資料解析**：[PapaParse](https://www.papaparse.com/)
-- **單元測試**：[Vitest](https://vitest.dev/) (20 組單元測試通過)
-- **端到端測試**：[Playwright](https://playwright.dev/) (17 組端到端測試通過，包含 9 Viewports RWD 與黑白雙主題)
-- **響應式與雙主題**：
-  - 完美相容 9 種主流 Viewport 尺寸（320px、375px、390px、430px、768px、1024px、1280px、1440px、1920px），頁面零水平溢出。
-  - System（跟隨系統）、Light、Dark 黑白雙主題即時切換與持久化。
+商業軟體常將簡單的關鍵字正負統計包裝為黑盒演算法，缺乏透明度與推導依據。Review Signal 專為產品經理、UX 研究員與用戶體驗團隊打造，堅持**確定性規則詞典 (Deterministic Rule-Based NLP)** 與可審計的數學公式，完整呈現命中詞彙與加權證據鏈
+
+所有運算均於使用者瀏覽器本機執行，透過 IndexedDB 持久化存儲標籤與筆記，零資料上傳雲端，兼顧專業分析深度與隱私安全
 
 ---
 
-## 🚀 部署至 Vercel
+## 核心亮點
 
-本專案為標準 Vite SPA，已內建 [`vercel.json`](file:///c:/Users/User/Rei/Code/Gemini38plan/review-signal/vercel.json)：
+- **確定性情感規則引擎** — 改編自 NTUSD 情感詞庫，結合否定詞極性翻轉（「不」、「未」、「無法」）與程度副詞強度加權（1.4x ~ 1.8x），提供完全公開的平滑雙曲歸一化數學公式與特徵證據鏈
+- **瀏覽器原生中文斷詞** — 直接調用現代瀏覽器 `Intl.Segmenter`，結合 200+ 台灣電商、SaaS 軟體與外送物流領域專屬複合詞庫，零外部大型權重下載
+- **N-gram 探勘與雙向鑽取** — 支援 1-gram、2-gram、3-gram 快速切換，提供自訂停用詞管理；點擊任意詞彙即時過濾並高亮標記對應評論
+- **四象限修復優先級矩陣** — 結合評論量佔比 (Volume) 與平均星等 (Rating)，自動判定「緊急修復」、「重點關注」、「持續優化」與「表現良好」
+- **ECharts 5 獨立五分區可視化** — 評分星等直方圖點選過濾、雙 Y 軸情緒時序堆疊柱與平均星等走勢折線；嚴格劃分 Header、Description、Statistics、Chart、Footer，杜絕重疊遮擋
+- **手動標籤與研究員質化筆記** — 支援單筆或勾選多筆批次打標，每則評論可記錄質化訪談備註、根本原因推論與跨部門處理建議
+- **IndexedDB 本機持久化** — 採用 `idb` 非同步資料庫，自訂資料集、手動標籤與研究筆記在瀏覽器重啟後完整留存，100% 離線可用
+- **無亂碼匯出與報告即時預覽** — 匯出帶 UTF-8 BOM 之 CSV（微軟 Excel 開啟繁中保證不亂碼）、JSON 資料庫，以及包含 KPI、緊急清單與倫理聲明的 Markdown 報告
+- **響應式排版與黑白雙主題** — 通過 9 種 Viewport（320px ~ 1920px）全域無水平溢出驗證，支援 System（跟隨系統）、Light、Dark 主題，且在 200% 文字放大下排版自然延展
 
-### 方式 1：GitHub 連結部署（推薦）
-1. 將本專案推送到 GitHub：
-   ```bash
-   git remote add origin https://github.com/<your-username>/review-signal.git
-   git branch -M main
-   git push -u origin main
-   ```
-2. 在 [Vercel 儀表板 (vercel.com)](https://vercel.com/) 點擊 **"Add New Project"**，選擇該儲存庫。
-3. Framework Preset 會自動識別為 **Vite**，Build Command 為 `npm run build`，Output Directory 為 `dist`。
-4. 點擊 **"Deploy"**，約 20 秒即可上線。
+---
 
-### 方式 2：使用 Vercel CLI
+## 演算法透明度與計算公式
+
+本平台公開情緒評分標準，拒絕不透明的黑盒標籤：
+
+### 1. 平滑雙曲歸一化評分
+
+$$\text{Normalized Score} = \frac{\text{PositiveScore} - \text{NegativeScore}}{\text{TotalScore} + 0.5} \in [-1.0, +1.0]$$
+
+### 2. 滑動視窗修飾機制
+
+- **否定詞翻轉 (Negation)**：視窗向前探測「不、沒、無、未、非、無法」，動態反轉後續情感極性（如：「好用 (+1.0)」→「不好用 (-1.0)」）
+- **程度副詞放大 (Intensifier)**：視窗向前探測「超、非常、極度、太、無比」，乘上 1.4x ~ 1.8x 強度倍率（如：「超爛 (-1.1 × 1.5 = -1.65)」）
+
+每則評論均可透過「深入檢視」查看分詞樹狀證據與規則對比
+
+---
+
+## 技術棧
+
+| 領域 | 技術 | 說明 |
+| --- | --- | --- |
+| 核心框架 | [React 18](https://react.dev/) + [TypeScript 5](https://www.typescriptlang.org/) | 嚴格型別定義與元件化架構 |
+| 建置工具 | [Vite 5](https://vitejs.dev/) | 輕量秒速 HMR 與生產環境最佳化打包 |
+| 樣式系統 | [Tailwind CSS](https://tailwindcss.com/) | 高對比工作台風格、全域雙主題、無多餘漸層發光 |
+| 圖表繪製 | [Apache ECharts 5](https://echarts.apache.org/) (`echarts-for-react`) | 向量 SVG 渲染、containLabel 自動留白、點擊雙向連動 |
+| 本機存儲 | [IndexedDB](https://developer.mozilla.org/zh-TW/docs/Web/API/IndexedDB_API) (`idb`) | 結構化資料本機持久化，保護研究隱私 |
+| 資料解析 | [PapaParse](https://www.papaparse.com/) | CSV 自動欄位偵測、編碼相容與異常評分正規化 |
+| 圖標庫 | [Lucide React](https://lucide.dev/) | 簡潔一致的工程工作台視覺圖示 |
+| 測試套件 | [Vitest](https://vitest.dev/) + [Playwright](https://playwright.dev/) | 核心演算法單元測試與端到端排版防禦驗證 |
+
+---
+
+## 快速開始
+
+### 環境需求
+
+- Node.js 18.0 或以上版本
+- npm 9.0 或以上版本
+
+### 安裝與啟動
+
 ```bash
-npx vercel
-npx vercel --prod
+# 1. 複製儲存庫
+git clone https://github.com/ReiKama414/review-signal.git
+cd review-signal
+
+# 2. 安裝依賴套件
+npm install
+
+# 3. 啟動本機開發伺服器
+npm run dev -- --port 3008
 ```
 
+> **提醒：** 啟動後於瀏覽器造訪 [http://localhost:3008](http://localhost:3008)，即可進入完整功能的工作台
+
 ---
 
-## 💻 本地端運行與驗證
+## 測試與驗證
+
+專案具備完整自動化測試體系，全數測試均於真實環境下執行驗證：
+
+| 測試類型 | 執行指令 | 涵蓋範疇 |
+| --- | --- | --- |
+| 單元測試 (Unit) | `npm test` | 5 組套件、20 項測試：斷詞重組、詞典滑動視窗、分類優先矩陣、CSV/JSON 解析與 BOM 匯出 |
+| 核心互動 (E2E) | `npx playwright test e2e/review-signal.spec.ts` | 8 項主要流程：範例載入、圖表渲染、關鍵字搜尋、字詞鑽取、透明沙盒、深入檢視、Markdown 匯出 |
+| 響應式 (RWD) | `npx playwright test e2e/rwd-theme-viewport.spec.ts` | 9 種指定 Viewport（320px、375px、390px、430px、768px、1024px、1280px、1440px、1920px）全域無溢出 |
+| 零重疊 (Zero-Overlap) | `npx playwright test e2e/zero-overlap-layout.spec.ts` | 8 項排版防禦：Header/Stats/Chart 獨立 Bounding Box 碰撞檢測、200% 文字放大延展、資料動態重繪 |
+| 完整執行 (All E2E) | `npm run test:e2e` | 一鍵執行全數 25 項端到端自動化測試 |
+
+---
+
+## 生產建置與部署
+
+### 1. 本地生產建置
 
 ```bash
-# 1. 啟動開發伺服器
-npm run dev
-# 瀏覽器訪問 http://localhost:3000
-
-# 2. 執行核心計算單元測試 (Vitest)
-npm test
-
-# 3. 執行 Playwright 端到端瀏覽器測試 (E2E)
-npm run test:e2e
-
-# 4. 生產環境建置檢查
 npm run build
 ```
 
+建置產物輸出至 `dist/`，包含 TypeScript 檢查與 Vite 資源最佳化分塊
+
+### 2. 部署至 Vercel
+
+本專案已內建 [vercel.json](./vercel.json)：
+
+- **方式一（GitHub 連結）**：推送到 GitHub 後，於 [Vercel 控制台](https://vercel.com/) 點擊「Add New Project」選取該儲存庫，Framework Preset 自動辨識為 Vite，直接部署
+- **方式二（Vercel CLI）**：
+  ```bash
+  npx vercel
+  npx vercel --prod
+  ```
+
 ---
 
-## ⚠️ 已知限制與倫理說明
+## 資料處理與隱私界線
 
-1. **詞典規則覆蓋範圍**：當前情緒計分完全由公開詞典（NTUSD 改編）與修飾詞乘數計算，具備 100% 可解釋性。對於深層語意反詰、複雜雙關語或隱喻，詞典可能判定為中性。本平台絕不私自宣稱其為生成式神經網路模型。
-2. **純本地計算限制**：大檔案匯入（超過 5 萬筆）之解析與斷詞在單線程 JavaScript 運算時可能需花費 2~3 秒，建議分批或按月匯入。所有運算皆在用戶瀏覽器內完成，資料絕不上傳第三方伺服器。
+- **純本機計算**：所有分詞、情感計分、分類矩陣與圖表渲染皆在使用者瀏覽器執行，絕不上傳第三方伺服器
+- **離線資料庫**：自訂標籤與質化研究筆記寫入本機 IndexedDB（資料庫名稱：`review-signal-db`）
+- **容量建議**：瀏覽器單執行緒解析建議單檔在 50,000 則評論以內；超大型資料集建議分批或按月份匯入
+
+---
+
+## 已知限制
+
+- **詞典規則邊界**：規則引擎依賴確定性詞庫與前後滑動修飾詞，具備百分之百可解釋性；對於極深層反諷、雙關語或隱喻，可能判定為中性
+- **內建範例情境**：預設提供電商購物（36 則）、SaaS 工具反饋（24 則）與美食外送（30 則）三套真實情境資料集，便於快速體驗
+- **字型環境**：中文字體優先調用作業系統預設之蘋方（PingFang SC）、微軟正黑體（Microsoft JhengHei）與思源黑體，維持工作台專業簡潔質感
+
+---
+
+## 身分與對外連結
+
+| 項目 | 值 |
+| --- | --- |
+| 作者 | ReiKama414（Myers） |
+| GitHub | [ReiKama414/review-signal](https://github.com/ReiKama414/review-signal) |
+| 個人網站 | [作品集](https://reikama414.vercel.app/) |
+| 授權全文 | [LICENSE](./LICENSE) |
+
+---
+
+## License / 權限
+
+Copyright (c) ReiKama414. All rights reserved.
+
+本專案僅供個人瀏覽與學習。未經著作權人書面同意，不得使用、複製、修改、散布或併入其他專案（含非商業用途）
+
+- [GitHub](https://github.com/ReiKama414/review-signal)
+- [個人網站](https://reikama414.vercel.app/)
+- [授權全文](./LICENSE)
+
+---
+
+<sub>Copyright (c) 2026 ReiKama414. All rights reserved.</sub>

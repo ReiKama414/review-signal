@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Review Signal - 評論研究與顧客之聲專業工作台 (Vite + React + ECharts + IndexedDB)",
   "private": true,
+  "license": "UNLICENSED",
   "type": "module",
   "scripts": {
     "dev": "vite",
