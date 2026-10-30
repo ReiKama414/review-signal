@@ -1,170 +1,170 @@
 # Review Signal
 
-> **顧客之聲 (VoC) 與評論研究專業工作台**，整合原生繁中斷詞、確定性詞典情感分析、N-gram 語塊探勘、四象限修復優先級矩陣與 ECharts 視覺化
+[繁體中文](README.zh-TW.md) · **English**
+
+> **Pure Frontend Voice of Customer & Review Research Studio**, 100% in-browser sandbox computation with zero server data transfer.
+
+<p align="center">
+  <img src="docs/preview.png" alt="Review Signal Studio Preview" width="880" />
+</p>
 
 <p align="center">
   <a href="https://github.com/ReiKama414/review-signal">GitHub</a> ·
-  <a href="https://reikama414.vercel.app/">個人網站</a> ·
-  <a href="#快速開始">快速開始</a> ·
-  <a href="#測試與驗證">測試驗證</a> ·
-  <a href="#license--權限">License</a>
+  <a href="https://reikama414.vercel.app/">Portfolio</a> ·
+  <a href="#key-highlights">Highlights</a> ·
+  <a href="#getting-started">Getting Started</a> ·
+  <a href="#testing--validation">Validation</a> ·
+  <a href="#license">License</a>
 </p>
 
 ---
 
-## 為什麼做
+## Key Highlights
 
-商業軟體常將簡單的關鍵字正負統計包裝為黑盒演算法，缺乏透明度與推導依據。Review Signal 專為產品經理、UX 研究員與用戶體驗團隊打造，堅持**確定性規則詞典 (Deterministic Rule-Based NLP)** 與可審計的數學公式，完整呈現命中詞彙與加權證據鏈
-
-所有運算均於使用者瀏覽器本機執行，透過 IndexedDB 持久化存儲標籤與筆記，零資料上傳雲端，兼顧專業分析深度與隱私安全
-
----
-
-## 核心亮點
-
-- **確定性情感規則引擎** — 改編自 NTUSD 情感詞庫，結合否定詞極性翻轉（「不」、「未」、「無法」）與程度副詞強度加權（1.4x ~ 1.8x），提供完全公開的平滑雙曲歸一化數學公式與特徵證據鏈
-- **瀏覽器原生中文斷詞** — 直接調用現代瀏覽器 `Intl.Segmenter`，結合 200+ 台灣電商、SaaS 軟體與外送物流領域專屬複合詞庫，零外部大型權重下載
-- **N-gram 探勘與雙向鑽取** — 支援 1-gram、2-gram、3-gram 快速切換，提供自訂停用詞管理；點擊任意詞彙即時過濾並高亮標記對應評論
-- **四象限修復優先級矩陣** — 結合評論量佔比 (Volume) 與平均星等 (Rating)，自動判定「緊急修復」、「重點關注」、「持續優化」與「表現良好」
-- **ECharts 5 獨立五分區可視化** — 評分星等直方圖點選過濾、雙 Y 軸情緒時序堆疊柱與平均星等走勢折線；嚴格劃分 Header、Description、Statistics、Chart、Footer，杜絕重疊遮擋
-- **手動標籤與研究員質化筆記** — 支援單筆或勾選多筆批次打標，每則評論可記錄質化訪談備註、根本原因推論與跨部門處理建議
-- **IndexedDB 本機持久化** — 採用 `idb` 非同步資料庫，自訂資料集、手動標籤與研究筆記在瀏覽器重啟後完整留存，100% 離線可用
-- **無亂碼匯出與報告即時預覽** — 匯出帶 UTF-8 BOM 之 CSV（微軟 Excel 開啟繁中保證不亂碼）、JSON 資料庫，以及包含 KPI、緊急清單與倫理聲明的 Markdown 報告
-- **響應式排版與黑白雙主題** — 通過 9 種 Viewport（320px ~ 1920px）全域無水平溢出驗證，支援 System（跟隨系統）、Light、Dark 主題，且在 200% 文字放大下排版自然延展
+- **Pure In-Browser Computation** — All file parsing, Chinese tokenization, rule-based sentiment scoring, and chart rendering execute locally in the client browser with zero server dependencies or data transmission.
+- **Deterministic Rule-Based Sentiment Engine** — Adapted from the NTUSD sentiment lexicon, integrating sliding window negation reversal ("not", "never", "unable") and degree adverb multipliers (1.4x to 1.8x), providing a fully auditable hyperbolic normalization formula and feature evidence chain.
+- **Native Browser Chinese Segmentation** — Native `Intl.Segmenter` Chinese text segmentation augmented with 200+ domain compound terms for Taiwan e-commerce, SaaS software, and on-demand delivery, requiring zero heavy external dictionary or model downloads.
+- **N-gram Mining & Cross-Filtering Drill-Down** — Instant switching across 1-gram, 2-gram, and 3-gram language blocks with custom stopwords management; clicking any token immediately cross-filters and highlights matching customer reviews.
+- **Four-Quadrant Action Priority Matrix** — Synthesizes complaint volume share and average customer rating to categorize operational friction into Critical Action, High Priority, Medium Priority, and Healthy.
+- **Five-Zone Isolated Chart Visualization** — Interactive ECharts rating distribution histogram with click-to-filter, dual-axis stacked volume timeline, and daily rating trend line; strictly separated Header, Description, Statistics, Chart Canvas, and Footer zones to eliminate overlap.
+- **Responsive Design & Dual Theme** — Support for System, Light, and Dark modes across 9 distinct viewports (320px to 1920px), engineered with a strict Zero-Overlap Document Flow layout that scales naturally under 200% text magnification.
+- **IndexedDB Offline Persistence** — Browser-native storage engine automatically persists datasets, custom manual tags, and qualitative researcher notes across browser restarts.
 
 ---
 
-## 演算法透明度與計算公式
+## Built-in Datasets
 
-本平台公開情緒評分標準，拒絕不透明的黑盒標籤：
+The studio comes preloaded with three real-world scenario datasets, while also supporting custom CSV and JSON drag-and-drop ingestion:
 
-### 1. 平滑雙曲歸一化評分
-
-$$\text{Normalized Score} = \frac{\text{PositiveScore} - \text{NegativeScore}}{\text{TotalScore} + 0.5} \in [-1.0, +1.0]$$
-
-### 2. 滑動視窗修飾機制
-
-- **否定詞翻轉 (Negation)**：視窗向前探測「不、沒、無、未、非、無法」，動態反轉後續情感極性（如：「好用 (+1.0)」→「不好用 (-1.0)」）
-- **程度副詞放大 (Intensifier)**：視窗向前探測「超、非常、極度、太、無比」，乘上 1.4x ~ 1.8x 強度倍率（如：「超爛 (-1.1 × 1.5 = -1.65)」）
-
-每則評論均可透過「深入檢視」查看分詞樹狀證據與規則對比
+| Dataset Name | Dimensions | Key Attributes | Analytical Focus |
+| :--- | :--- | :--- | :--- |
+| Taiwan E-Commerce Customer Reviews | 36 reviews · 8 fields | Rating, Content, Date, Category, Tags, Device, Version | Shipping delays, coupon checkout errors, app version crash, return and refund disputes |
+| SaaS Agile Collaboration Tool Feedback | 24 reviews · 8 fields | Rating, Content, Date, Category, Tags, Device, Version | Kanban board memory spikes, API rate limiting, offline sync conflict, pricing strategy |
+| Food Delivery & Fresh Grocery Reviews | 30 reviews · 8 fields | Rating, Content, Date, Category, Tags, Device, Version | Delivery timeouts, soup spillage, ignored customer notes, customer support refund speed |
 
 ---
 
-## 技術棧
+## Mathematical Precision Guarantees
 
-| 領域 | 技術 | 說明 |
-| --- | --- | --- |
-| 核心框架 | [React 18](https://react.dev/) + [TypeScript 5](https://www.typescriptlang.org/) | 嚴格型別定義與元件化架構 |
-| 建置工具 | [Vite 5](https://vitejs.dev/) | 輕量秒速 HMR 與生產環境最佳化打包 |
-| 樣式系統 | [Tailwind CSS](https://tailwindcss.com/) | 高對比工作台風格、全域雙主題、無多餘漸層發光 |
-| 圖表繪製 | [Apache ECharts 5](https://echarts.apache.org/) (`echarts-for-react`) | 向量 SVG 渲染、containLabel 自動留白、點擊雙向連動 |
-| 本機存儲 | [IndexedDB](https://developer.mozilla.org/zh-TW/docs/Web/API/IndexedDB_API) (`idb`) | 結構化資料本機持久化，保護研究隱私 |
-| 資料解析 | [PapaParse](https://www.papaparse.com/) | CSV 自動欄位偵測、編碼相容與異常評分正規化 |
-| 圖標庫 | [Lucide React](https://lucide.dev/) | 簡潔一致的工程工作台視覺圖示 |
-| 測試套件 | [Vitest](https://vitest.dev/) + [Playwright](https://playwright.dev/) | 核心演算法單元測試與端到端排版防禦驗證 |
+Every analytical algorithm and scoring metric is verified via independent unit tests (100% pass rate) to guarantee mathematical consistency with raw customer feedback:
+
+- **Smooth Hyperbolic Normalized Sentiment Score**:
+  $$\text{Score} = \frac{\text{PositiveScore} - \text{NegativeScore}}{\text{TotalScore} + 0.5} \in [-1.0, +1.0]$$
+- **Negation Modifier (Sliding Window)**:
+  Detects preceding negation tokens ("不", "沒", "無", "未", "非", "無法") within a 3-token forward window, inverting target token polarity ($\times -1.0$).
+- **Intensifier Modifier (Sliding Window)**:
+  Detects degree adverbs ("超", "非常", "極度", "太", "無比") within a 2-token forward window, applying a multiplier of $1.4\times \sim 1.8\times$.
+- **Customer Satisfaction Score (CSAT)**:
+  $$\text{CSAT} = \frac{\text{Count}(\text{Rating} \ge 4)}{N} \times 100\%$$
+- **Net Promoter Score Proxy (NPS)**:
+  $$\text{NPS} = \left(\frac{\text{Count}(\text{Rating} \ge 4) - \text{Count}(\text{Rating} \le 2)}{N}\right) \times 100$$
+- **Four-Quadrant Action Matrix Thresholds**:
+  $$\text{Critical} \iff (\text{Rating} < 2.5) \land (\text{Share} \ge 15\%), \quad \text{High} \iff (\text{Rating} < 3.0) \lor (\text{Share} \ge 25\%)$$
 
 ---
 
-## 快速開始
+## Tech Stack
 
-### 環境需求
+| Layer | Technology | Purpose |
+| :--- | :--- | :--- |
+| Frontend Framework | React 18 · TypeScript | Component modularity and strict type-safety guarantees |
+| Build Tool | Vite | Ultra-fast local development server and optimized Rollup production bundling |
+| Styling & Theme | Tailwind CSS | High-density workbench aesthetic with unified dark/light design tokens |
+| Data Visualization | Apache ECharts | Responsive charts, containLabel layout isolation, and dual-axis composed timeline |
+| Data Ingestion | PapaParse | High-performance streaming CSV parser with UTF-8 BOM export support |
+| Local Persistence | Native IndexedDB (`idb`) | Multi-dataset persistence, manual tags, and researcher notes restoration |
+| UI Iconography | Lucide Icons | Minimal, pixel-crisp geometric vector icons |
+| Automated Testing | Playwright · Vitest | E2E user flows, 9-viewport RWD, theme switching, and zero-overlap layout verification |
 
-- Node.js 18.0 或以上版本
-- npm 9.0 或以上版本
+---
 
-### 安裝與啟動
+## Getting Started
+
+### Prerequisites
+
+Node.js 18+ and npm.
+
+### Installation & Development
 
 ```bash
-# 1. 複製儲存庫
-git clone https://github.com/ReiKama414/review-signal.git
-cd review-signal
-
-# 2. 安裝依賴套件
+# 1. Install dependencies
 npm install
 
-# 3. 啟動本機開發伺服器
+# 2. Start local development server
 npm run dev -- --port 3008
 ```
 
-> **提醒：** 啟動後於瀏覽器造訪 [http://localhost:3008](http://localhost:3008)，即可進入完整功能的工作台
+Open the printed local URL (default: `http://localhost:3008`) in your browser.
 
----
-
-## 測試與驗證
-
-專案具備完整自動化測試體系，全數測試均於真實環境下執行驗證：
-
-| 測試類型 | 執行指令 | 涵蓋範疇 |
-| --- | --- | --- |
-| 單元測試 (Unit) | `npm test` | 5 組套件、20 項測試：斷詞重組、詞典滑動視窗、分類優先矩陣、CSV/JSON 解析與 BOM 匯出 |
-| 核心互動 (E2E) | `npx playwright test e2e/review-signal.spec.ts` | 8 項主要流程：範例載入、圖表渲染、關鍵字搜尋、字詞鑽取、透明沙盒、深入檢視、Markdown 匯出 |
-| 響應式 (RWD) | `npx playwright test e2e/rwd-theme-viewport.spec.ts` | 9 種指定 Viewport（320px、375px、390px、430px、768px、1024px、1280px、1440px、1920px）全域無溢出 |
-| 零重疊 (Zero-Overlap) | `npx playwright test e2e/zero-overlap-layout.spec.ts` | 8 項排版防禦：Header/Stats/Chart 獨立 Bounding Box 碰撞檢測、200% 文字放大延展、資料動態重繪 |
-| 完整執行 (All E2E) | `npm run test:e2e` | 一鍵執行全數 25 項端到端自動化測試 |
-
----
-
-## 生產建置與部署
-
-### 1. 本地生產建置
+### Production Build & Preview
 
 ```bash
+# Execute TypeScript checking and production bundle
 npm run build
+
+# Preview production build locally
+npm run preview
 ```
 
-建置產物輸出至 `dist/`，包含 TypeScript 檢查與 Vite 資源最佳化分塊
+---
 
-### 2. 部署至 Vercel
+## User Workflow
 
-本專案已內建 [vercel.json](./vercel.json)：
-
-- **方式一（GitHub 連結）**：推送到 GitHub 後，於 [Vercel 控制台](https://vercel.com/) 點擊「Add New Project」選取該儲存庫，Framework Preset 自動辨識為 Vite，直接部署
-- **方式二（Vercel CLI）**：
-  ```bash
-  npx vercel
-  npx vercel --prod
-  ```
+1. **Dataset Loading**: Choose between 3 preloaded real-world datasets, drag-and-drop local CSV/JSON files, or paste raw clipboard content.
+2. **Quality & Overview Diagnostics**: Inspect total review counts, average ratings, CSAT satisfaction, NPS proxy scores, and lexicon polarity ratios.
+3. **Rating Distribution Filtering**: Click any bar in the rating histogram to isolate specific star ratings; click reset to restore all observations.
+4. **Timeline & Spike Tracking**: Examine daily stacked volume distributions alongside average rating trends to locate product incidents and operational spikes.
+5. **N-gram Mining & Token Drill-Down**: Switch between 1-gram, 2-gram, and 3-gram language blocks to identify root-cause keywords and drill down into matching customer reviews.
+6. **Stopwords Customization**: Access the stopwords drawer to add or remove noise tokens, keeping the keyword cloud focused on actionable product insights.
+7. **Action Priority Matrix**: Review 8 functional categories ranked across the four-quadrant action matrix with immediate red alerts for critical issues.
+8. **Deep Inspection & Export**: Open any review to audit rule-based mathematical evidence, add manual tags (`#Bug`), save researcher notes, and export UTF-8 BOM CSV, JSON, or Markdown reports.
 
 ---
 
-## 資料處理與隱私界線
+## Testing & Validation
 
-- **純本機計算**：所有分詞、情感計分、分類矩陣與圖表渲染皆在使用者瀏覽器執行，絕不上傳第三方伺服器
-- **離線資料庫**：自訂標籤與質化研究筆記寫入本機 IndexedDB（資料庫名稱：`review-signal-db`）
-- **容量建議**：瀏覽器單執行緒解析建議單檔在 50,000 則評論以內；超大型資料集建議分批或按月份匯入
+The project undergoes automated validation covering rule accuracy, layout stability, and browser workflows (25 automated tests):
 
----
+```bash
+# Run deterministic rule & parsing unit tests
+npm test
 
-## 已知限制
+# Run full Playwright browser suite (Interaction, 9 Viewports RWD, Zero-Overlap)
+npm run test:e2e
+```
 
-- **詞典規則邊界**：規則引擎依賴確定性詞庫與前後滑動修飾詞，具備百分之百可解釋性；對於極深層反諷、雙關語或隱喻，可能判定為中性
-- **內建範例情境**：預設提供電商購物（36 則）、SaaS 工具反饋（24 則）與美食外送（30 則）三套真實情境資料集，便於快速體驗
-- **字型環境**：中文字體優先調用作業系統預設之蘋方（PingFang SC）、微軟正黑體（Microsoft JhengHei）與思源黑體，維持工作台專業簡潔質感
+Validation Checklist:
 
----
-
-## 身分與對外連結
-
-| 項目 | 值 |
-| --- | --- |
-| 作者 | ReiKama414（Myers） |
-| GitHub | [ReiKama414/review-signal](https://github.com/ReiKama414/review-signal) |
-| 個人網站 | [作品集](https://reikama414.vercel.app/) |
-| 授權全文 | [LICENSE](./LICENSE) |
+- **Mathematical & Lexical Precision**: Tokenization compound preservation, sliding window negation, intensifier weighting, and classification matrices verified to 100% numerical accuracy.
+- **Interactive Workflows**: Dataset switching, full-text keyword search, multi-dimensional filtering, token drill-down, methodology sandbox, manual tagging, and report exports.
+- **RWD Verification**: Zero horizontal page overflow verified across 320px, 375px, 390px, 430px, 768px, 1024px, 1280px, 1440px, and 1920px viewports.
+- **Dual Theme Support**: System preference detection, light/dark mode toggling, and localStorage persistence.
+- **Zero-Overlap Architecture**: Non-intersecting bounding box verification between titles, statistics, chart canvases, and legends under 100% and 200% zoom levels.
 
 ---
 
-## License / 權限
+## Known Limitations
+
+> **Note:**
+> 1. All calculations execute on the browser's single thread; datasets under 50,000 rows or 20MB are recommended for optimal 60fps interaction.
+> 2. Offline storage relies on the browser's IndexedDB storage quota. Incognito sessions will clear persisted datasets upon closing the window.
+> 3. Uploaded CSVs should be UTF-8 encoded; please convert legacy Big5 CSVs before loading.
+
+---
+
+## License
 
 Copyright (c) ReiKama414. All rights reserved.
 
-本專案僅供個人瀏覽與學習。未經著作權人書面同意，不得使用、複製、修改、散布或併入其他專案（含非商業用途）
+This software and its source code are provided solely for personal viewing and learning purposes.
+No permission is granted to use, copy, modify, distribute, sublicense, or incorporate this software
+or any part of it into other projects, whether for commercial or non-commercial purposes,
+without the express written consent of the copyright holder.
 
 - [GitHub](https://github.com/ReiKama414/review-signal)
-- [個人網站](https://reikama414.vercel.app/)
-- [授權全文](./LICENSE)
+- [Portfolio](https://reikama414.vercel.app/)
+- [Full License](./LICENSE)
 
 ---
 
-<sub>Copyright (c) 2026 ReiKama414. All rights reserved.</sub>
+<sub>Review Signal · Customer Voice & Review Research Studio · ReiKama414</sub>
