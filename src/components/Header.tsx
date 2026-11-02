@@ -343,7 +343,7 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           <div className="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-slate-800 text-xs">
-            <span className="text-slate-500 dark:text-slate-400">介面主題風格</span>
+            <span className="text-slate-500 dark:text-slate-400">介面主題風格：</span>
             <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg">
               <button
                 onClick={() => onThemeChange('system')}
