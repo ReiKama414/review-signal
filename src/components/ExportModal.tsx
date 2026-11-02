@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { Review, RatingStats, CategorySummary, TokenStat } from '@/types';
 import { exportToCSV, exportToJSON, exportToMarkdown, generateMarkdownReport } from '@/lib/export';
+import { useEscapeKey } from '@/lib/useEscapeKey';
 
 interface ExportModalProps {
   isOpen: boolean;
@@ -33,6 +34,8 @@ export const ExportModal: React.FC<ExportModalProps> = ({
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState<'options' | 'preview'>('options');
 
+  useEscapeKey(isOpen, onClose);
+
   if (!isOpen) return null;
 
   const markdownContent = generateMarkdownReport(
@@ -44,13 +47,26 @@ export const ExportModal: React.FC<ExportModalProps> = ({
   );
 
   const handleCopyMarkdown = () => {
-    navigator.clipboard.writeText(markdownContent);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    const done = () => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(markdownContent).then(done).catch(() => {
+        window.alert('無法存取剪貼簿，請手動選取預覽內容後複製。');
+      });
+    } else {
+      window.alert('此瀏覽器不支援剪貼簿 API，請手動選取預覽內容後複製。');
+    }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 dark:bg-black/80 backdrop-blur-sm animate-in fade-in duration-150">
+    <div
+      role="dialog"
+      aria-modal="true"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 dark:bg-black/80 backdrop-blur-sm animate-in fade-in duration-150"
+      onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
       <div 
         className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-[calc(100vw-1.5rem)] sm:max-w-2xl max-h-[calc(100vh-2rem)] flex flex-col shadow-2xl overflow-hidden transition-colors"
         onClick={(e) => e.stopPropagation()}
@@ -163,7 +179,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
               {/* Option 3: Markdown Executive Report */}
               <div 
                 onClick={() => {
-                  exportToMarkdown(reviews, ratingStats, categories, topKeywords, `${datasetName}-report.md`);
+                  exportToMarkdown(reviews, ratingStats, categories, topKeywords, `${datasetName}-report.md`, datasetName);
                   onClose();
                 }}
                 className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-amber-500 cursor-pointer transition-all group flex items-start space-x-3"

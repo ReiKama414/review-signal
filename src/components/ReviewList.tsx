@@ -68,12 +68,17 @@ export const ReviewList: React.FC<ReviewListProps> = ({
     }
   };
 
+  const allSelected = reviews.length > 0 && reviews.every(r => selectedIds.has(r.id));
+
   // 關鍵字高亮工具
   const renderHighlightedContent = (text: string) => {
-    if (!highlightToken || !highlightToken.trim()) return text;
-    const parts = text.split(new RegExp(`(${highlightToken})`, 'gi'));
+    const keyword = highlightToken ? highlightToken.trim() : '';
+    if (!keyword) return text;
+    // 轉義正規表達式特殊字元，避免搜尋 "(" "[" "*" "+" 等字元時拋出 SyntaxError 導致整頁白屏
+    const escaped = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const parts = text.split(new RegExp(`(${escaped})`, 'gi'));
     return parts.map((part, i) => 
-      part.toLowerCase() === highlightToken.toLowerCase() ? (
+      part.toLowerCase() === keyword.toLowerCase() ? (
         <mark key={i} className="bg-amber-300 dark:bg-amber-500/80 text-slate-900 dark:text-black font-semibold px-0.5 rounded">
           {part}
         </mark>
@@ -88,7 +93,7 @@ export const ReviewList: React.FC<ReviewListProps> = ({
       
       {/* Batch Action Bar if any items selected */}
       {selectedIds.size > 0 && (
-        <div className="sticky top-16 z-30 p-2.5 sm:p-3 rounded-xl bg-indigo-900 text-white border border-indigo-700 shadow-lg flex flex-wrap items-center justify-between gap-2 text-xs animate-in fade-in max-w-full">
+        <div className="sticky top-14 sm:top-16 z-30 p-2.5 sm:p-3 rounded-xl bg-indigo-900 text-white border border-indigo-700 shadow-lg flex flex-wrap items-center justify-between gap-2 text-xs animate-in fade-in max-w-full">
           <div className="flex items-center space-x-2">
             <span className="font-bold">已選取 {selectedIds.size} 則評論</span>
             <button
@@ -141,15 +146,16 @@ export const ReviewList: React.FC<ReviewListProps> = ({
       {/* Select All Row */}
       <div className="flex items-center justify-between px-1 text-xs text-slate-500 dark:text-slate-400">
         <button
-          onClick={selectedIds.size === reviews.length ? onDeselectAll : onSelectAll}
-          className="flex items-center space-x-1.5 hover:text-slate-900 dark:hover:text-white transition-colors"
+          onClick={allSelected ? onDeselectAll : onSelectAll}
+          disabled={reviews.length === 0}
+          className="flex items-center space-x-1.5 hover:text-slate-900 dark:hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {selectedIds.size === reviews.length && reviews.length > 0 ? (
+          {allSelected ? (
             <CheckSquare className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
           ) : (
             <Square className="w-4 h-4 text-slate-400 dark:text-slate-600" />
           )}
-          <span>全選本頁 ({reviews.length})</span>
+          <span>全選目前篩選結果 ({reviews.length})</span>
         </button>
 
         <span className="text-[11px] text-slate-400 hidden sm:inline">
@@ -208,6 +214,9 @@ export const ReviewList: React.FC<ReviewListProps> = ({
                       onClick={(e) => e.stopPropagation()}
                       className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded px-1.5 py-0.5 text-xs text-slate-800 dark:text-slate-300 focus:outline-none focus:border-indigo-500 max-w-[130px] sm:max-w-[180px] truncate"
                     >
+                      {!PRESET_CATEGORIES.some(c => c.category === review.category) && (
+                        <option value={review.category}>{review.category || '未分類'}</option>
+                      )}
                       {PRESET_CATEGORIES.map(c => (
                         <option key={c.category} value={c.category}>{c.category}</option>
                       ))}
@@ -266,7 +275,7 @@ export const ReviewList: React.FC<ReviewListProps> = ({
                     {sentiment.evidence.map((ev, i) => (
                       <span
                         key={i}
-                        className={`px-1 py-0.2 rounded font-mono text-[9px] border ${
+                        className={`px-1 py-px rounded font-mono text-[9px] border ${
                           ev.weight > 0
                             ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300'
                             : 'bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300'

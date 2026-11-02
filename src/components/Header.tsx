@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { SAMPLE_DATASETS } from '@/lib/samples';
 import { ThemeMode } from '@/lib/theme';
+import { useEscapeKey } from '@/lib/useEscapeKey';
 
 interface HeaderProps {
   onOpenImport: () => void;
@@ -41,6 +42,11 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [themeDropdownOpen, setThemeDropdownOpen] = useState(false);
+
+  useEscapeKey(themeDropdownOpen || mobileMenuOpen, () => {
+    setThemeDropdownOpen(false);
+    setMobileMenuOpen(false);
+  });
 
   const cycleTheme = () => {
     if (theme === 'system') onThemeChange('light');
@@ -150,6 +156,14 @@ export const Header: React.FC<HeaderProps> = ({
               )}
               <ChevronDown className="w-3 h-3 text-slate-400" />
             </button>
+
+            {themeDropdownOpen && (
+              <div
+                className="fixed inset-0 z-40"
+                aria-hidden="true"
+                onClick={() => setThemeDropdownOpen(false)}
+              />
+            )}
 
             {themeDropdownOpen && (
               <div 

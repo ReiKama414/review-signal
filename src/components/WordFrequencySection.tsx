@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { TokenStat, Review } from '@/types';
 import { extractTokenStats, DEFAULT_STOPWORDS } from '@/lib/tokenizer';
+import { useEscapeKey } from '@/lib/useEscapeKey';
 
 interface WordFrequencySectionProps {
   reviews: Review[];
@@ -37,6 +38,8 @@ export const WordFrequencySection: React.FC<WordFrequencySectionProps> = ({
     const lower = filterKeyword.toLowerCase().trim();
     return stats.filter(s => s.word.toLowerCase().includes(lower));
   }, [stats, filterKeyword]);
+
+  useEscapeKey(showStopwordsDrawer, () => setShowStopwordsDrawer(false));
 
   const handleAddStopword = () => {
     const word = newStopwordInput.trim().toLowerCase();
@@ -170,7 +173,7 @@ export const WordFrequencySection: React.FC<WordFrequencySectionProps> = ({
                 >
                   <span className="font-medium truncate">{stat.word}</span>
 
-                  <span className={`px-1 py-0.2 rounded font-mono text-[9px] ${
+                  <span className={`px-1 py-px rounded font-mono text-[9px] ${
                     isSelected 
                       ? 'bg-indigo-700 text-indigo-100' 
                       : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
@@ -208,7 +211,12 @@ export const WordFrequencySection: React.FC<WordFrequencySectionProps> = ({
 
       {/* Stopwords Drawer Modal */}
       {showStopwordsDrawer && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 bg-black/60 dark:bg-black/80 backdrop-blur-sm animate-in fade-in">
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 bg-black/60 dark:bg-black/80 backdrop-blur-sm animate-in fade-in"
+          onMouseDown={(e) => { if (e.target === e.currentTarget) setShowStopwordsDrawer(false); }}
+        >
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl w-full max-w-[calc(100vw-1.5rem)] sm:max-w-md p-4 shadow-xl flex flex-col max-h-[85vh]">
             <div className="flex items-center justify-between pb-2.5 border-b border-slate-200 dark:border-slate-800">
               <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white flex items-center space-x-1.5">

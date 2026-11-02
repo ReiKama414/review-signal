@@ -105,6 +105,8 @@ export default function App() {
     setActiveDatasetName(sample.name);
     setFilters(INITIAL_FILTERS);
     setSelectedReviewIds(new Set());
+    setInspectingReview(null);
+    setIsDbSynced(false);
 
     const success = await saveReviewsToDB(processedReviews, sample.name);
     setIsDbSynced(success);
@@ -115,6 +117,8 @@ export default function App() {
     setActiveDatasetName(datasetName);
     setFilters(INITIAL_FILTERS);
     setSelectedReviewIds(new Set());
+    setInspectingReview(null);
+    setIsDbSynced(false);
 
     const success = await saveReviewsToDB(importedReviews, datasetName);
     setIsDbSynced(success);
@@ -149,25 +153,23 @@ export default function App() {
 
   // 批次新增標籤
   const handleBatchAddTag = async (newTag: string) => {
-    const updatedIds: string[] = [];
-    setReviews(prev => prev.map(r => {
-      if (selectedReviewIds.has(r.id)) {
-        updatedIds.push(r.id);
-        const nextTags = r.tags.includes(newTag) ? r.tags : [...r.tags, newTag];
-        return { ...r, tags: nextTags };
+    // 注意：不可在 setState updater 內累積副作用（updater 可能延遲執行或在 StrictMode 下執行兩次），
+    // 因此直接以目前的 reviews 計算要更新的項目。
+    const updates = new Map<string, string[]>();
+    reviews.forEach(r => {
+      if (selectedReviewIds.has(r.id) && !r.tags.includes(newTag)) {
+        updates.set(r.id, [...r.tags, newTag]);
       }
-      return r;
-    }));
+    });
 
-    for (const id of updatedIds) {
-      const target = reviews.find(r => r.id === id);
-      if (target) {
-        const nextTags = target.tags.includes(newTag) ? target.tags : [...target.tags, newTag];
-        await updateReviewInDB(id, { tags: nextTags });
-      }
-    }
+    setReviews(prev => prev.map(r => (updates.has(r.id) ? { ...r, tags: updates.get(r.id)! } : r)));
+    setInspectingReview(prev => (prev && updates.has(prev.id) ? { ...prev, tags: updates.get(prev.id)! } : prev));
 
     setSelectedReviewIds(new Set());
+
+    await Promise.all(
+      Array.from(updates.entries()).map(([id, tags]) => updateReviewInDB(id, { tags }))
+    );
   };
 
   // 取得現有資料中的所有標籤與分類
@@ -298,6 +300,16 @@ export default function App() {
   const topKeywords = useMemo(() => {
     return extractTokenStats(reviews, 1, 20);
   }, [reviews]);
+
+  // 篩選條件改變後，移除已不在目前清單中的選取項目，避免批次動作影響使用者看不見的評論
+  useEffect(() => {
+    setSelectedReviewIds(prev => {
+      if (prev.size === 0) return prev;
+      const visible = new Set(filteredReviews.map(r => r.id));
+      const next = new Set(Array.from(prev).filter(id => visible.has(id)));
+      return next.size === prev.size ? prev : next;
+    });
+  }, [filteredReviews]);
 
   const inspectingIndex = useMemo(() => {
     if (!inspectingReview) return -1;

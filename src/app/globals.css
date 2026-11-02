@@ -66,6 +66,15 @@ html.dark ::-webkit-scrollbar-thumb:hover {
 }
 
 /* Form input focus styles */
+/* 跟隨目前主題（<html> 上的 color-scheme），避免淺色模式下原生下拉選單/捲軸變成深色 */
 input, select, textarea {
-  color-scheme: light dark;
+  color-scheme: inherit;
+}
+
+html.light {
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
 }

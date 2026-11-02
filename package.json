@@ -1,7 +1,8 @@
 {
   "name": "review-signal",
   "version": "1.0.0",
-  "description": "Review Signal - 評論研究與顧客之聲專業工作台 (Vite + React + ECharts + IndexedDB)",
+  "description": "Pure-frontend voice-of-customer and review research studio with sentiment signals, trends, and local persistence",
+  "homepage": "https://reikama414.github.io/review-signal/",
   "private": true,
   "license": "UNLICENSED",
   "type": "module",

@@ -79,8 +79,17 @@ export const CategoryAnalysisSection: React.FC<CategoryAnalysisSectionProps> = (
           return (
             <div
               key={cat.category}
+              role="button"
+              tabIndex={0}
+              aria-pressed={isSelected}
               onClick={() => onSelectCategory(isSelected ? null : cat.category)}
-              className={`p-2.5 sm:p-3 rounded-lg border cursor-pointer transition-all min-w-0 flex flex-col justify-between ${
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  onSelectCategory(isSelected ? null : cat.category);
+                }
+              }}
+              className={`p-2.5 sm:p-3 rounded-lg border cursor-pointer transition-all min-w-0 flex flex-col justify-between focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
                 isSelected
                   ? 'bg-indigo-50 dark:bg-indigo-950/40 border-indigo-500 dark:border-indigo-500 shadow-sm'
                   : isCritical
@@ -128,17 +137,17 @@ export const CategoryAnalysisSection: React.FC<CategoryAnalysisSectionProps> = (
               {/* Progress bar of Sentiment */}
               <div className="h-1.5 w-full bg-slate-200 dark:bg-slate-800 rounded-full flex overflow-hidden">
                 <div 
-                  style={{ width: `${((cat.positiveCount / cat.count) * 100).toFixed(0)}%` }} 
+                  style={{ width: `${((cat.positiveCount / cat.count) * 100).toFixed(1)}%` }} 
                   className="bg-emerald-500 h-full" 
                   title={`正面: ${cat.positiveCount}`}
                 />
                 <div 
-                  style={{ width: `${((cat.neutralCount / cat.count) * 100).toFixed(0)}%` }} 
+                  style={{ width: `${((cat.neutralCount / cat.count) * 100).toFixed(1)}%` }} 
                   className="bg-slate-400 dark:bg-slate-600 h-full" 
                   title={`中性: ${cat.neutralCount}`}
                 />
                 <div 
-                  style={{ width: `${((cat.negativeCount / cat.count) * 100).toFixed(0)}%` }} 
+                  style={{ width: `${((cat.negativeCount / cat.count) * 100).toFixed(1)}%` }} 
                   className="bg-rose-500 h-full" 
                   title={`負面: ${cat.negativeCount}`}
                 />

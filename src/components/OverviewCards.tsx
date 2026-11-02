@@ -138,7 +138,7 @@ export const OverviewCards: React.FC<OverviewCardsProps> = ({ reviews, ratingSta
         {/* Visual Bar */}
         <div className="mt-1.5 h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full flex overflow-hidden">
           <div style={{ width: `${posPercent}%` }} className="bg-emerald-500 h-full" />
-          <div style={{ width: `${((neuCount / total) * 100).toFixed(0)}%` }} className="bg-slate-400 dark:bg-slate-600 h-full" />
+          <div style={{ width: `${((neuCount / total) * 100).toFixed(1)}%` }} className="bg-slate-400 dark:bg-slate-600 h-full" />
           <div style={{ width: `${negPercent}%` }} className="bg-rose-500 h-full" />
         </div>
       </div>

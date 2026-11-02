@@ -133,9 +133,10 @@ export function exportToMarkdown(
   ratingStats: RatingStats,
   categories: CategorySummary[],
   topKeywords: TokenStat[],
-  filename: string = 'review-signal-report.md'
+  filename: string = 'review-signal-report.md',
+  datasetName?: string
 ) {
-  const md = generateMarkdownReport(reviews, ratingStats, categories, topKeywords);
+  const md = generateMarkdownReport(reviews, ratingStats, categories, topKeywords, datasetName);
   const blob = new Blob([md], { type: 'text/markdown;charset=utf-8;' });
   downloadBlob(blob, filename);
 }
@@ -144,9 +145,11 @@ function downloadBlob(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = filename;
+  // 移除檔名中的非法字元（Windows / macOS 不允許 \ / : * ? " < > |）
+  a.download = filename.replace(/[\\/:*?"<>|]/g, '_');
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  // 延遲釋放，避免部分瀏覽器尚未開始下載就被撤銷
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }

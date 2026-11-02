@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   X, 
   Star, 
@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { Review } from '@/types';
 import { PRESET_CATEGORIES } from '@/lib/categories';
+import { useEscapeKey } from '@/lib/useEscapeKey';
 
 interface ReviewDetailModalProps {
   review: Review | null;
@@ -36,14 +37,26 @@ export const ReviewDetailModal: React.FC<ReviewDetailModalProps> = ({
   const [notesInput, setNotesInput] = useState(review?.notes || '');
   const [isSaved, setIsSaved] = useState(false);
 
+  // 切換評論（上一筆/下一筆/重新開啟）時同步筆記與暫存輸入，避免筆記被寫到錯誤的評論
+  const reviewId = review?.id;
+  const reviewNotes = review?.notes;
+  useEffect(() => {
+    setNotesInput(reviewNotes || '');
+    setNewTagInput('');
+    setIsSaved(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reviewId]);
+
+  useEscapeKey(Boolean(review), onClose);
+
   if (!review) return null;
 
   const handleAddTag = () => {
     const trimmed = newTagInput.trim();
     if (trimmed && !review.tags.includes(trimmed)) {
       onUpdateTags([...review.tags, trimmed]);
-      setNewTagInput('');
     }
+    setNewTagInput('');
   };
 
   const handleRemoveTag = (tagToRemove: string) => {
@@ -59,7 +72,12 @@ export const ReviewDetailModal: React.FC<ReviewDetailModalProps> = ({
   const sentiment = review.sentiment;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 dark:bg-black/80 backdrop-blur-sm animate-in fade-in duration-150">
+    <div
+      role="dialog"
+      aria-modal="true"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 dark:bg-black/80 backdrop-blur-sm animate-in fade-in duration-150"
+      onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
       <div 
         className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-[calc(100vw-1.5rem)] sm:max-w-3xl max-h-[calc(100vh-2rem)] flex flex-col shadow-2xl overflow-hidden transition-colors"
         onClick={(e) => e.stopPropagation()}
@@ -231,6 +249,9 @@ export const ReviewDetailModal: React.FC<ReviewDetailModalProps> = ({
                 onChange={(e) => onUpdateCategory(e.target.value)}
                 className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-indigo-500"
               >
+                {!PRESET_CATEGORIES.some(c => c.category === review.category) && (
+                  <option value={review.category}>{review.category || '未分類'}</option>
+                )}
                 {PRESET_CATEGORIES.map(c => (
                   <option key={c.category} value={c.category}>{c.category}</option>
                 ))}

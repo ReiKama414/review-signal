@@ -19,7 +19,8 @@ export const TrendTimelineEChart: React.FC<TrendTimelineEChartProps> = ({ review
     }>();
 
     reviews.forEach(r => {
-      const date = r.date || '未知日期';
+      // 以「日」為單位彙整：ISO 時間戳 (YYYY-MM-DDTHH:mm:ss) 只取日期部分，避免每筆各自成為一個觀測點
+      const date = r.date ? r.date.slice(0, 10) : '未知日期';
       let entry = map.get(date);
       if (!entry) {
         entry = {
@@ -43,7 +44,7 @@ export const TrendTimelineEChart: React.FC<TrendTimelineEChartProps> = ({ review
       const avg = Number((val.totalRating / val.count).toFixed(2));
       points.push({
         date,
-        label: date.slice(5),
+        label: /^\d{4}-\d{2}-\d{2}$/.test(date) ? date.slice(5) : date,
         count: val.count,
         avgRating: avg,
         avgRatingNum: avg,
@@ -57,6 +58,8 @@ export const TrendTimelineEChart: React.FC<TrendTimelineEChartProps> = ({ review
   }, [reviews]);
 
   const dates = trendData.map(d => d.label);
+  const firstDate = trendData.length > 0 ? trendData[0].date : 'N/A';
+  const lastDate = trendData.length > 0 ? trendData[trendData.length - 1].date : 'N/A';
   const posCounts = trendData.map(d => d.positiveCount);
   const neuCounts = trendData.map(d => d.neutralCount);
   const negCounts = trendData.map(d => d.negativeCount);
@@ -182,11 +185,11 @@ export const TrendTimelineEChart: React.FC<TrendTimelineEChartProps> = ({ review
         </div>
         <div className="flex items-baseline space-x-1 min-w-[75px]">
           <span className="text-[11px] text-slate-500 dark:text-slate-400">起始日期：</span>
-          <span className="text-slate-700 dark:text-slate-300 font-mono">{dates[0] || 'N/A'}</span>
+          <span className="text-slate-700 dark:text-slate-300 font-mono">{firstDate}</span>
         </div>
         <div className="flex items-baseline space-x-1 min-w-[75px]">
           <span className="text-[11px] text-slate-500 dark:text-slate-400">最新日期：</span>
-          <span className="text-slate-700 dark:text-slate-300 font-mono">{dates[dates.length - 1] || 'N/A'}</span>
+          <span className="text-slate-700 dark:text-slate-300 font-mono">{lastDate}</span>
         </div>
       </div>
 

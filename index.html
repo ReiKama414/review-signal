@@ -6,8 +6,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Review Signal - 評論研究與顧客之聲分析工作台</title>
     <meta name="description" content="專業級評論研究平台：CSV/JSON 評論匯入、評分分布、時間趨勢、字詞頻率、N-gram 挖掘、手動標籤與問題分類統計。清楚區分字詞規則與真 AI 模型，100% 本地 IndexedDB 隱私儲存。" />
+    <script>
+      // 在首次繪製前套用已儲存的主題，避免淺色模式使用者看到深色閃爍 (FOUC)
+      (function () {
+        try {
+          var stored = localStorage.getItem('review_signal_theme');
+          var mode = stored === 'light' || stored === 'dark' || stored === 'system' ? stored : 'system';
+          var dark = mode === 'dark' || (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          var root = document.documentElement;
+          root.classList.toggle('dark', dark);
+          root.classList.toggle('light', !dark);
+          root.setAttribute('data-theme', dark ? 'dark' : 'light');
+          root.style.colorScheme = dark ? 'dark' : 'light';
+        } catch (e) {}
+      })();
+    </script>
   </head>
-  <body class="min-h-screen bg-slate-950 text-slate-100 antialiased selection:bg-indigo-600 selection:text-white">
+  <body class="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased selection:bg-indigo-600 selection:text-white">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

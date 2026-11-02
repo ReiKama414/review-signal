@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { analyzeSentimentRuleBased } from '@/lib/sentiment';
 import { tokenizeText } from '@/lib/tokenizer';
+import { useEscapeKey } from '@/lib/useEscapeKey';
 
 interface MethodologyModalProps {
   isOpen: boolean;
@@ -19,6 +20,8 @@ export const MethodologyModal: React.FC<MethodologyModalProps> = ({ isOpen, onCl
   const [sandboxInput, setSandboxInput] = useState('退貨流程超快而且客服態度親切，完全不卡頓！');
   const [activeTab, setActiveTab] = useState<'comparison' | 'formula' | 'sandbox'>('comparison');
 
+  useEscapeKey(isOpen, onClose);
+
   if (!isOpen) return null;
 
   // 實時在沙盒中執行規則分析
@@ -26,7 +29,12 @@ export const MethodologyModal: React.FC<MethodologyModalProps> = ({ isOpen, onCl
   const testResult = analyzeSentimentRuleBased(testTokens, sandboxInput);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 dark:bg-black/80 backdrop-blur-sm animate-in fade-in duration-150">
+    <div
+      role="dialog"
+      aria-modal="true"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 dark:bg-black/80 backdrop-blur-sm animate-in fade-in duration-150"
+      onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
       <div 
         className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-[calc(100vw-1.5rem)] sm:max-w-4xl max-h-[calc(100vh-2rem)] flex flex-col shadow-2xl overflow-hidden transition-colors"
         onClick={(e) => e.stopPropagation()}

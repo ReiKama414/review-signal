@@ -12,6 +12,7 @@ import {
 import { parseCSV, parseJSON } from '@/lib/parser';
 import { SAMPLE_DATASETS } from '@/lib/samples';
 import { Review } from '@/types';
+import { useEscapeKey } from '@/lib/useEscapeKey';
 
 interface ImportModalProps {
   isOpen: boolean;
@@ -32,6 +33,8 @@ export const ImportModal: React.FC<ImportModalProps> = ({
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEscapeKey(isOpen, onClose);
 
   if (!isOpen) return null;
 
@@ -101,7 +104,12 @@ export const ImportModal: React.FC<ImportModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 dark:bg-black/80 backdrop-blur-sm animate-in fade-in duration-150">
+    <div
+      role="dialog"
+      aria-modal="true"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 dark:bg-black/80 backdrop-blur-sm animate-in fade-in duration-150"
+      onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
       <div 
         className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-[calc(100vw-1.5rem)] sm:max-w-2xl max-h-[calc(100vh-2rem)] flex flex-col shadow-2xl overflow-hidden transition-colors"
         onClick={(e) => e.stopPropagation()}
@@ -184,8 +192,11 @@ export const ImportModal: React.FC<ImportModalProps> = ({
                 accept=".csv,.json,text/csv,application/json"
                 className="hidden"
                 onChange={(e) => {
-                  if (e.target.files && e.target.files[0]) {
-                    handleFileProcess(e.target.files[0]);
+                  const file = e.target.files && e.target.files[0];
+                  // 重置 input，避免失敗後重新選擇同一個檔案不觸發 change
+                  e.target.value = '';
+                  if (file) {
+                    handleFileProcess(file);
                   }
                 }}
               />
@@ -251,9 +262,9 @@ export const ImportModal: React.FC<ImportModalProps> = ({
               <button
                 onClick={handlePasteProcess}
                 disabled={isProcessing}
-                className="w-full py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-xs transition-all flex items-center justify-center space-x-1.5"
+                className="w-full py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-xs transition-all flex items-center justify-center space-x-1.5 disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                <span>開始解析並載入</span>
+                <span>{isProcessing ? '解析中...' : '開始解析並載入'}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
@@ -276,7 +287,7 @@ export const ImportModal: React.FC<ImportModalProps> = ({
                 >
                   <div className="flex items-center justify-between mb-1">
                     <div className="flex items-center space-x-1.5">
-                      <span className="text-[10px] font-semibold px-1.5 py-0.2 rounded bg-indigo-100 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/20">
+                      <span className="text-[10px] font-semibold px-1.5 py-px rounded bg-indigo-100 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/20">
                         {sample.industry}
                       </span>
                       <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
