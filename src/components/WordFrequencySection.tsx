@@ -60,8 +60,8 @@ export const WordFrequencySection: React.FC<WordFrequencySectionProps> = ({
     <div className="p-3.5 sm:p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between transition-colors min-w-0">
       
       {/* Header & Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
-        <div className="min-w-0">
+      <div className="card-section-head border-b border-slate-100 dark:border-slate-800/80 mb-3 pb-3 min-w-0">
+        <div className="min-w-0 pr-1">
           <div className="flex flex-wrap items-center gap-1.5">
             <h3 className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-white tracking-tight break-words">
               字詞頻率與 N-gram 挖掘
@@ -76,7 +76,7 @@ export const WordFrequencySection: React.FC<WordFrequencySectionProps> = ({
         </div>
 
         {/* N-gram Selector & Stopwords Config */}
-        <div className="flex items-center space-x-1.5 self-start sm:self-auto shrink-0">
+        <div className="flex items-center gap-2 shrink-0 flex-wrap pl-0.5">
           {/* 1-gram / 2-gram / 3-gram toggle */}
           <div className="flex p-0.5 bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs">
             <button
@@ -118,31 +118,34 @@ export const WordFrequencySection: React.FC<WordFrequencySectionProps> = ({
       </div>
 
       {/* Filter and Selected Indicator */}
-      <div className="flex flex-wrap items-center justify-between gap-1.5 mb-2.5">
-        <div className="relative flex-1 min-w-[140px] max-w-xs">
-          <Search className="w-3 h-3 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            value={filterKeyword}
-            onChange={(e) => setFilterKeyword(e.target.value)}
-            placeholder="搜尋探勘詞..."
-            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg pl-7 pr-3 py-1 text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:border-indigo-500"
-          />
+      <div className="toolbar-row mb-3">
+        <div className="toolbar-field flex-1 min-w-[140px] max-w-md">
+          <span className="toolbar-field-label text-slate-400 dark:text-slate-500">探勘詞篩選</span>
+          <div className="relative toolbar-control-height">
+            <Search className="w-3 h-3 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              value={filterKeyword}
+              onChange={(e) => setFilterKeyword(e.target.value)}
+              placeholder="搜尋探勘詞..."
+              className="toolbar-control-height w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg pl-8 pr-3 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500"
+            />
+          </div>
         </div>
+      </div>
 
         {selectedToken && (
-          <div className="flex items-center space-x-1 bg-indigo-50 dark:bg-indigo-500/20 border border-indigo-200 dark:border-indigo-500/40 px-2 py-0.5 rounded text-xs text-indigo-700 dark:text-indigo-300">
+          <div className="flex items-center space-x-1 bg-indigo-50 dark:bg-indigo-500/20 border border-indigo-200 dark:border-indigo-500/40 px-2.5 py-1 rounded-lg text-xs text-indigo-700 dark:text-indigo-300 mb-2.5">
             <span>「{selectedToken}」</span>
             <button 
               onClick={() => onSelectToken(null)}
-              className="hover:text-slate-900 dark:hover:text-white"
+              className="hover:text-slate-900 dark:hover:text-white p-0.5"
               aria-label="清除字詞篩選"
             >
               <X className="w-3 h-3" />
             </button>
           </div>
         )}
-      </div>
 
       {/* Word Cloud / Chips List */}
       <div className="flex-1 max-h-56 sm:max-h-64 overflow-y-auto pr-1">

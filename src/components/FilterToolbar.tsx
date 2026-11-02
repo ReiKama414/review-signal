@@ -53,56 +53,56 @@ export const FilterToolbar: React.FC<FilterToolbarProps> = ({
   };
 
   return (
-    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 sm:p-4 shadow-sm space-y-2.5 transition-colors min-w-0">
+    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 sm:p-4 shadow-sm space-y-3 transition-colors min-w-0">
       
       {/* Top Search & Sort Row */}
-      <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center justify-between">
-        
-        {/* Search Input */}
-        <div className="relative flex-1 min-w-0">
-          <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            value={filters.searchQuery}
-            onChange={(e) => onFilterChange({ searchQuery: e.target.value })}
-            placeholder="搜尋評論內文、作者、裝置或關鍵字..."
-            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg pl-8 pr-8 py-1.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500 transition-colors"
-          />
-          {filters.searchQuery && (
-            <button
-              onClick={() => onFilterChange({ searchQuery: '' })}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 dark:hover:text-white p-1"
-              aria-label="清除搜尋"
-            >
-              <X className="w-3 h-3" />
-            </button>
-          )}
-        </div>
-
-        {/* Sort Dropdown */}
-        <div className="flex items-center space-x-1.5 shrink-0 self-end sm:self-auto">
-          <div className="flex items-center space-x-1 text-xs text-slate-500 dark:text-slate-400">
-            <ArrowUpDown className="w-3 h-3" />
-            <span className="hidden sm:inline">排序：</span>
+      <div className="toolbar-row justify-between gap-y-2">
+        <div className="toolbar-field flex-1 min-w-0">
+          <span className="toolbar-field-label text-slate-400 dark:text-slate-500">全文搜尋</span>
+          <div className="relative toolbar-control-height">
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              value={filters.searchQuery}
+              onChange={(e) => onFilterChange({ searchQuery: e.target.value })}
+              placeholder="搜尋評論內文、作者、裝置或關鍵字..."
+              className="toolbar-control-height w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg pl-8 pr-8 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500 transition-colors"
+            />
+            {filters.searchQuery && (
+              <button
+                type="button"
+                onClick={() => onFilterChange({ searchQuery: '' })}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 dark:hover:text-white p-1 rounded"
+                aria-label="清除搜尋"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            )}
           </div>
-          <select
-            value={filters.sortBy}
-            onChange={(e) => onFilterChange({ sortBy: e.target.value as any })}
-            className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-2 py-1.5 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-indigo-500 max-w-[150px] truncate"
-          >
-            <option value="date_desc">最新發布</option>
-            <option value="date_asc">最早發布</option>
-            <option value="rating_asc">評分由低至高</option>
-            <option value="rating_desc">評分由高至低</option>
-            <option value="sentiment_asc">負向優先</option>
-            <option value="sentiment_desc">正向優先</option>
-          </select>
         </div>
 
+        <div className="toolbar-field shrink-0 sm:min-w-[168px]">
+          <span className="toolbar-field-label text-slate-400 dark:text-slate-500">排序方式</span>
+          <div className="toolbar-control-height flex items-center gap-1.5">
+            <ArrowUpDown className="w-3 h-3 text-slate-400 shrink-0" />
+            <select
+              value={filters.sortBy}
+              onChange={(e) => onFilterChange({ sortBy: e.target.value as any })}
+              className="toolbar-control-height w-full min-w-0 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-2.5 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-indigo-500"
+            >
+              <option value="date_desc">最新發布</option>
+              <option value="date_asc">最早發布</option>
+              <option value="rating_asc">評分由低至高</option>
+              <option value="rating_desc">評分由高至低</option>
+              <option value="sentiment_asc">負向優先</option>
+              <option value="sentiment_desc">正向優先</option>
+            </select>
+          </div>
+        </div>
       </div>
 
       {/* Multi-Select Filters Row */}
-      <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-slate-100 dark:border-slate-800 text-xs">
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-2 pt-2.5 border-t border-slate-100 dark:border-slate-800 text-xs px-0.5">
         
         {/* Star Rating Pills */}
         <span className="text-slate-500 dark:text-slate-400 text-[11px] font-medium mr-0.5">星等：</span>
